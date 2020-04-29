@@ -1,8 +1,8 @@
 package com.project.gulimallcoupon.coupon.controller;
 
+import java.sql.Array;
 import java.util.Arrays;
 import java.util.Map;
-
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +15,6 @@ import com.project.gulimallcoupon.coupon.entity.CouponEntity;
 import com.project.gulimallcoupon.coupon.service.CouponService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
-
-
 
 /**
  * 优惠券信息
@@ -31,6 +29,15 @@ public class CouponController {
     @Autowired
     private CouponService couponService;
 
+    //会员的所有优惠券
+    @RequestMapping("/member/list")
+    public R memberCoupons(){
+        CouponEntity couponEntity = new CouponEntity();
+        couponEntity.setCouponName("满1000减100");
+        return R.ok().put("allCoupons", Arrays.asList(couponEntity));
+    }
+
+
     /**
      * 列表
      */
@@ -38,7 +45,6 @@ public class CouponController {
     //@RequiresPermissions("coupon:coupon:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = couponService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 
