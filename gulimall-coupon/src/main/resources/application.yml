@@ -1,6 +1,5 @@
 
-server:
-  port: 8000
+
 
 spring:
   #redis配置
@@ -9,12 +8,12 @@ spring:
     port: 6379
 
   #配置Nacos地址
-  application:
-    name: gulimall-coupon-8000
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 59.110.137.100:8848
+#  application:
+#    name: gulimall-coupon-8000
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 59.110.137.100:8848
 
   #数据库配置
   datasource:
