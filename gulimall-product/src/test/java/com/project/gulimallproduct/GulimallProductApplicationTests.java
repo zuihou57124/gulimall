@@ -10,17 +10,9 @@ import javax.annotation.Resource;
 @SpringBootTest
 class GulimallProductApplicationTests {
 
-    //@Autowired(required = false)
-    @Resource(name = "brandService")
-    BrandService brandService;
-
     @Test
     void contextLoads() {
 
-        BrandEntity brandEntity = new BrandEntity();
-        brandEntity.setName("huawei");
-        brandEntity.setDescript("手机品牌");
-        brandService.save(brandEntity);
 
     }
 

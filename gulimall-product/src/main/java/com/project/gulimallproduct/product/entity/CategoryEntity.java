@@ -1,9 +1,11 @@
 package com.project.gulimallproduct.product.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.Data;
 
@@ -18,6 +20,12 @@ import lombok.Data;
 @TableName("pms_category")
 public class CategoryEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 子分类
+	 */
+	@TableField(exist = false)
+	private List<CategoryEntity> childCate;
 
 	/**
 	 * 分类id
