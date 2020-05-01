@@ -3,6 +3,7 @@ package com.project.gulimallproduct.product.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,11 +45,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
         List<CategoryEntity> categoryEntityList = categoryDao.selectList(null);
 
-        categoryEntityList = categoryEntityList.stream().filter(category->category.getParentCid()==0)
+        categoryEntityList = categoryEntityList.stream()
+           .filter(category->category.getParentCid()==0)
            .map(categoryEntity ->{
                categoryEntity.setChildCate(getChild(categoryEntity,allCategory));
                return categoryEntity;
-           }).sorted((o1,o2)->o1.getSort()-o2.getSort()).collect(Collectors.toList());
+           })
+           .sorted((o1,o2)->o1.getSort()-o2.getSort())
+           .collect(Collectors.toList());
         return categoryEntityList;
     }
 
@@ -58,13 +62,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      */
     public List<CategoryEntity> getChild(CategoryEntity root,List<CategoryEntity> allCate){
 
-          List<CategoryEntity> child = allCate.stream().filter(categoryEntity ->
+          List<CategoryEntity> child = allCate.stream()
+                .filter(categoryEntity ->
                 categoryEntity.getParentCid()==root.getCatId())
                 .map(categoryEntity -> {
                      categoryEntity.setChildCate(getChild(categoryEntity,allCate));
                      return categoryEntity;
-                }).collect(Collectors.toList());
-        return child;
+                })
+                .sorted(Comparator.comparingInt(o -> (o.getSort() == null ? 0 : o.getSort())))
+                .collect(Collectors.toList());
+          return child;
     }
 
 }
