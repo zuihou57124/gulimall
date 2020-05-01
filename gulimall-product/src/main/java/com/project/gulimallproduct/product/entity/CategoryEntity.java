@@ -1,9 +1,6 @@
 package com.project.gulimallproduct.product.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -31,7 +28,7 @@ public class CategoryEntity implements Serializable {
 	/**
 	 * 分类id
 	 */
-	@TableId
+	@TableId(value = "cat_id",type = IdType.AUTO)
 	private Long catId;
 	/**
 	 * 分类名称
