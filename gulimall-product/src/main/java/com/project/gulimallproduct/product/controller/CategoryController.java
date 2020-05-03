@@ -1,9 +1,15 @@
 package com.project.gulimallproduct.product.controller;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.OSSClientBuilder;
 import com.project.gulimallproduct.product.service.impl.CategoryServiceImpl;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +38,23 @@ import io.renren.common.utils.R;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired(required = false)
+    private OSSClient ossClient;
+
+    @RequestMapping("/upload")
+    public String ossTest() throws Exception {
+
+
+    // 上传文件流。
+        InputStream inputStream = new FileInputStream("C:\\Users\\root\\Desktop\\测试图片\\01.jpg");
+        ossClient.putObject("qinfengoss", "01.jpg", inputStream);
+
+    // 关闭OSSClient。
+        ossClient.shutdown();
+        return "yes";
+    }
+
 
     /**
      * 列表
