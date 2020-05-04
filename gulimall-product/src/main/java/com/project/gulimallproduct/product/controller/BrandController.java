@@ -1,9 +1,11 @@
 package com.project.gulimallproduct.product.controller;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,8 @@ import com.project.gulimallproduct.product.entity.BrandEntity;
 import com.project.gulimallproduct.product.service.BrandService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+
+import javax.validation.Valid;
 
 /**
  * 品牌
@@ -52,12 +56,13 @@ public class BrandController {
 
     /**
      * 保存
+     * @Valid 开启校验
+     * result 获得校验结果信息
      */
     @RequestMapping("/save")
     //@RequiresPermissions("product:brand:save")
-    public R save(@RequestBody BrandEntity brand){
-		brandService.save(brand);
-
+    public R save(@Valid @RequestBody BrandEntity brand/*, BindingResult result*/){
+        brandService.save(brand);
         return R.ok();
     }
 

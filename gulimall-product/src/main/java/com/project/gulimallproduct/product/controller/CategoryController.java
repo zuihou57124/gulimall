@@ -33,24 +33,6 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    //@Resource(name = "OSSClient")
-    @Autowired(required = false)
-    private OSS ossClient;
-
-    @RequestMapping("/upload")
-    public String ossTest() throws Exception {
-
-        ossClient = (OSSClient)ossClient;
-    // 上传文件流。
-        InputStream inputStream = new FileInputStream("C:\\Users\\root\\Desktop\\测试图片\\01.jpg");
-        ossClient.putObject("qinfengoss", "01.jpg", inputStream);
-
-    // 关闭OSSClient。
-        ossClient.shutdown();
-        return "yes";
-    }
-
-
     /**
      * 列表
      */
