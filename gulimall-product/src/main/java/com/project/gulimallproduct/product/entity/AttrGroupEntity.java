@@ -1,9 +1,12 @@
 package com.project.gulimallproduct.product.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.Data;
 
@@ -22,7 +25,7 @@ public class AttrGroupEntity implements Serializable {
 	/**
 	 * 分组id
 	 */
-	@TableId
+	@TableId(value = "attr_group_id",type = IdType.AUTO)
 	private Long attrGroupId;
 	/**
 	 * 组名
@@ -44,5 +47,8 @@ public class AttrGroupEntity implements Serializable {
 	 * 所属分类id
 	 */
 	private Long catelogId;
+
+	@TableField(exist = false)
+	private List catelogPath;
 
 }

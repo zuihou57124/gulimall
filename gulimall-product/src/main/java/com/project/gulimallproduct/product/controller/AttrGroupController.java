@@ -1,8 +1,9 @@
 package com.project.gulimallproduct.product.controller;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
+import com.project.gulimallproduct.product.entity.CategoryEntity;
+import com.project.gulimallproduct.product.service.CategoryService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +16,7 @@ import com.project.gulimallproduct.product.entity.AttrGroupEntity;
 import com.project.gulimallproduct.product.service.AttrGroupService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
-
+import sun.plugin.javascript.navig.Array;
 
 
 /**
@@ -30,6 +31,9 @@ import io.renren.common.utils.R;
 public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     /**
      * 列表
@@ -56,7 +60,18 @@ public class AttrGroupController {
     //@RequiresPermissions("product:attrgroup:info")
     public R info(@PathVariable("attrGroupId") Long attrGroupId){
 		AttrGroupEntity attrGroup = attrGroupService.getById(attrGroupId);
+        List<Long> path = new ArrayList<>();
+        CategoryEntity categoryEntity = null;
+        categoryEntity = categoryService.getById(attrGroup.getCatelogId());
+        path.add(categoryEntity.getCatId());
+        categoryEntity = categoryService.getById(categoryEntity.getParentCid());
+        path.add(categoryEntity.getCatId());
+        categoryEntity = categoryService.getById(categoryEntity.getParentCid());
+        path.add(categoryEntity.getCatId());
 
+        Collections.reverse(path);
+
+		attrGroup.setCatelogPath(path);
         return R.ok().put("attrGroup", attrGroup);
     }
 
