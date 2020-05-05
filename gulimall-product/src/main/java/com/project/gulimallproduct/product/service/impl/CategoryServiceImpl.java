@@ -22,6 +22,7 @@ import io.renren.common.utils.Query;
 import com.project.gulimallproduct.product.dao.CategoryDao;
 import com.project.gulimallproduct.product.entity.CategoryEntity;
 import com.project.gulimallproduct.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -64,6 +65,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return categoryEntityList;
     }
 
+
+    @Transactional
     @Override
     public void updateDetail(CategoryEntity category) {
 

@@ -1,5 +1,6 @@
 package com.project.gulimallproduct.product.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -22,7 +23,7 @@ public class AttrEntity implements Serializable {
 	/**
 	 * 属性id
 	 */
-	@TableId
+	@TableId(value = "attr_id",type = IdType.AUTO)
 	private Long attrId;
 	/**
 	 * 属性名

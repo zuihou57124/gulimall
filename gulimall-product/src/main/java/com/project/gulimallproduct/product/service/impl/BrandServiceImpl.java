@@ -16,6 +16,7 @@ import io.renren.common.utils.Query;
 import com.project.gulimallproduct.product.dao.BrandDao;
 import com.project.gulimallproduct.product.entity.BrandEntity;
 import com.project.gulimallproduct.product.service.BrandService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -54,6 +55,7 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
         }
     }
 
+    @Transactional
     @Override
     public void updateRelation(BrandEntity brand) {
         this.updateById(brand);
