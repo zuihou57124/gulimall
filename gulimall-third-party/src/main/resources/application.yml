@@ -1,0 +1,52 @@
+
+server:
+  port: 13000
+
+spring:
+
+  #redis配置
+  redis:
+    host: 59.110.137.100
+    port: 6379
+
+  application:
+    name: gulimall-third-party-13000
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 59.110.137.100:8848 #配置Nacos地址
+    alicloud:
+      access-key: LTAI4GCgva5jtoYnBtYEkfV2
+      secret-key: Psx2aEs86ncYoY58HhuQ5ZsAtiUTpD
+      oss:
+        endpoint: oss-cn-shenzhen.aliyuncs.com
+        bucket: qinfengoss
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://59.110.137.100:3306/gulimall_pms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      username: root
+      password: 123456
+#      initial-size: 10
+#      max-active: 100
+#      min-idle: 10
+#      max-wait: 60000
+#      pool-prepared-statements: true
+#      max-pool-prepared-statement-per-connection-size: 20
+#      time-between-eviction-runs-millis: 60000
+#      min-evictable-idle-time-millis: 300000
+
+#mybatis:
+#  mapper-locations: classpath:/mapper/**/*.xml
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-not-delete-value: 0
+      logic-delete-value: 1
+
+
