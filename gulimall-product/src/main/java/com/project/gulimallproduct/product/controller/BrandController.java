@@ -71,13 +71,13 @@ public class BrandController {
     }
 
     /**
-     * 修改
+     * 修改品牌名时，其他关联表的品牌名也应该同步更新
      */
     @RequestMapping("/update")
     //@RequiresPermissions("product:brand:update")
     public R update(@Validated(value = {Update.class}) @RequestBody BrandEntity brand){
-		brandService.updateById(brand);
-
+		//brandService.updateById(brand);
+        brandService.updateRelation(brand);
         return R.ok();
     }
 

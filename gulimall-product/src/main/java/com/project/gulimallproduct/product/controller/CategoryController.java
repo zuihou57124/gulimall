@@ -67,13 +67,13 @@ public class CategoryController {
     }
 
     /**
-     * 修改
+     * 修改分类名时，其他关联表的分类名也应该同步更新
      */
     @RequestMapping("/update")
     //@RequiresPermissions("product:category:update")
     public R update(@RequestBody CategoryEntity category){
-		categoryService.updateById(category);
-
+		//categoryService.updateById(category);
+        categoryService.updateDetail(category);
         return R.ok();
     }
 
