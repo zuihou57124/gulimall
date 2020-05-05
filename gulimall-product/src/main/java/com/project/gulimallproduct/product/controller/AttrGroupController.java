@@ -35,19 +35,25 @@ public class AttrGroupController {
      * 列表
      */
     @RequestMapping("/list")
-    @RequiresPermissions("product:attrgroup:list")
+    //@RequiresPermissions("product:attrgroup:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = attrGroupService.queryPage(params);
 
         return R.ok().put("page", page);
     }
 
-
+    @RequestMapping("/list/{catelogId}")
+    //@RequiresPermissions("product:attrgroup:list")
+    public R list(@RequestParam Map<String, Object> params,@PathVariable Long catelogId){
+        //params.put("catlogId",catlogId);
+        PageUtils page = attrGroupService.queryPage(params,catelogId);
+        return R.ok().put("page", page);
+    }
     /**
      * 信息
      */
     @RequestMapping("/info/{attrGroupId}")
-    @RequiresPermissions("product:attrgroup:info")
+    //@RequiresPermissions("product:attrgroup:info")
     public R info(@PathVariable("attrGroupId") Long attrGroupId){
 		AttrGroupEntity attrGroup = attrGroupService.getById(attrGroupId);
 
@@ -58,7 +64,7 @@ public class AttrGroupController {
      * 保存
      */
     @RequestMapping("/save")
-    @RequiresPermissions("product:attrgroup:save")
+    //@RequiresPermissions("product:attrgroup:save")
     public R save(@RequestBody AttrGroupEntity attrGroup){
 		attrGroupService.save(attrGroup);
 
@@ -69,7 +75,7 @@ public class AttrGroupController {
      * 修改
      */
     @RequestMapping("/update")
-    @RequiresPermissions("product:attrgroup:update")
+    //@RequiresPermissions("product:attrgroup:update")
     public R update(@RequestBody AttrGroupEntity attrGroup){
 		attrGroupService.updateById(attrGroup);
 
@@ -80,7 +86,7 @@ public class AttrGroupController {
      * 删除
      */
     @RequestMapping("/delete")
-    @RequiresPermissions("product:attrgroup:delete")
+    //@RequiresPermissions("product:attrgroup:delete")
     public R delete(@RequestBody Long[] attrGroupIds){
 		attrGroupService.removeByIds(Arrays.asList(attrGroupIds));
 
