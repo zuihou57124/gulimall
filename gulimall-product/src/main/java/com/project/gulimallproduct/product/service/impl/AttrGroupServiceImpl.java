@@ -1,13 +1,21 @@
 package com.project.gulimallproduct.product.service.impl;
 
+
+import com.project.gulimallproduct.product.dao.AttrAttrgroupRelationDao;
+import com.project.gulimallproduct.product.dao.AttrDao;
+import com.project.gulimallproduct.product.entity.AttrAttrgroupRelationEntity;
+import com.project.gulimallproduct.product.entity.AttrEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
-
 import com.project.gulimallproduct.product.dao.AttrGroupDao;
 import com.project.gulimallproduct.product.entity.AttrGroupEntity;
 import com.project.gulimallproduct.product.service.AttrGroupService;
@@ -19,6 +27,12 @@ import org.springframework.util.StringUtils;
  */
 @Service("attrGroupService")
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService {
+
+    @Autowired(required = false)
+    AttrAttrgroupRelationDao relationDao;
+
+    @Autowired(required = false)
+    AttrDao attrDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -56,5 +70,23 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             return new PageUtils(page);
 
         }
+    }
+
+    @Override
+    public PageUtils getAttrRelation(Map<String, Object> params, Long attrgroupId) {
+
+        QueryWrapper<AttrAttrgroupRelationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("attr_group_id",attrgroupId);
+        List<AttrAttrgroupRelationEntity> attrGroupEntityList = relationDao.selectList(queryWrapper);
+
+        List<Long> attrIdList = attrGroupEntityList.stream().map(
+                (AttrAttrgroupRelationEntity::getAttrId)
+        ).collect(Collectors.toList());
+
+        IPage<AttrEntity> page = attrDao.selectPage(
+                new Query<AttrEntity>().getPage(params),
+                new QueryWrapper<AttrEntity>().in("attr_id",attrIdList));
+
+        return new PageUtils(page);
     }
 }

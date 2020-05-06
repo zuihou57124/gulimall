@@ -143,17 +143,19 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrEntity attrEntity = this.getById(attrId);
         BeanUtils.copyProperties(attrEntity,attrRespVo);
 
-        //获取属性属于哪个属性分组
-        AttrAttrgroupRelationEntity attrGroupRelationEntity =
-                attrGroupRelationDao.selectOne
-                        (new QueryWrapper<AttrAttrgroupRelationEntity>()
-                                .eq("attr_id",attrId)
-                        );
-        //获取属性分组名称
-        if(attrGroupRelationEntity!=null&&attrGroupRelationEntity.getAttrGroupId()!=null&&attrGroupRelationEntity.getAttrGroupId()!=0){
-            AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrGroupRelationEntity.getAttrGroupId());
-            attrRespVo.setAttrGroupId(attrGroupRelationEntity.getAttrGroupId());
-            attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+        //获取属性属于哪个属性分组(销售属性不用)
+        if(attrRespVo.getSearchType()==1){
+            AttrAttrgroupRelationEntity attrGroupRelationEntity =
+                    attrGroupRelationDao.selectOne
+                            (new QueryWrapper<AttrAttrgroupRelationEntity>()
+                                    .eq("attr_id",attrId)
+                            );
+            //获取属性分组名称
+            if(attrGroupRelationEntity!=null&&attrGroupRelationEntity.getAttrGroupId()!=null&&attrGroupRelationEntity.getAttrGroupId()!=0){
+                AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrGroupRelationEntity.getAttrGroupId());
+                attrRespVo.setAttrGroupId(attrGroupRelationEntity.getAttrGroupId());
+                attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+            }
         }
 
         //获取属性的分类id
@@ -181,24 +183,28 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrEntity attrEntity = new AttrEntity();
         BeanUtils.copyProperties(attrVo,attrEntity);
         this.updateById(attrEntity);
+
         //更新属性与属性分组之间的联系(销售属性不用更新)
-        AttrAttrgroupRelationEntity attrGroupRelationEntity = new AttrAttrgroupRelationEntity();
-        attrGroupRelationEntity.setAttrId(attrEntity.getAttrId());
-        attrGroupRelationEntity.setAttrGroupId(attrVo.getAttrGroupId());
-        //如果修改前分组属性存在，修改后分组属性不存在，就把分组属性置为0
-        //，等同于null,防止错误关联
-        if(attrGroupRelationEntity.getAttrGroupId()==null){
-            attrGroupRelationEntity.setAttrGroupId((long) 0);
+        if(attrVo.getSearchType()==1){
+            AttrAttrgroupRelationEntity attrGroupRelationEntity = new AttrAttrgroupRelationEntity();
+            attrGroupRelationEntity.setAttrId(attrEntity.getAttrId());
+            attrGroupRelationEntity.setAttrGroupId(attrVo.getAttrGroupId());
+            //如果修改前分组属性存在，修改后分组属性不存在，就把分组属性置为0
+            //，等同于null,防止错误关联
+            if(attrGroupRelationEntity.getAttrGroupId()==null){
+                attrGroupRelationEntity.setAttrGroupId((long) 0);
+            }
+            attrGroupRelationDao.update(attrGroupRelationEntity,new UpdateWrapper<AttrAttrgroupRelationEntity>()
+                    .eq("attr_id",attrEntity.getAttrId()));
         }
-        attrGroupRelationDao.update(attrGroupRelationEntity,new UpdateWrapper<AttrAttrgroupRelationEntity>()
-                .eq("attr_id",attrEntity.getAttrId()));
+
 
     }
 
 
     /**
      * @param asList 需要删除的属性id列表
-     * 连带属性分组关联信息一起删除
+     * 如果是基本属性还要连带属性分组关联信息一起删除
      */
     @Transactional(rollbackFor = {})
     @Override

@@ -35,6 +35,20 @@ public class AttrGroupController {
     @Autowired
     private CategoryService categoryService;
 
+
+    /**
+     * 获取属性分组关联的属性列表
+     */
+    @RequestMapping("/{attrgroupId}/attr/relation")
+    //@RequiresPermissions("product:attrgroup:list")
+    public R relationAttrList(@RequestParam Map<String, Object> params,
+                              @PathVariable("attrgroupId") Long attrgroupId){
+        //PageUtils page = attrGroupService.queryPage(params);
+        PageUtils page = attrGroupService.getAttrRelation(params,attrgroupId);
+        return R.ok().put("page", page);
+    }
+
+
     /**
      * 列表
      */
