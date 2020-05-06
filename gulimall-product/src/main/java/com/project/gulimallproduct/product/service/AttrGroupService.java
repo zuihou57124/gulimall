@@ -1,6 +1,7 @@
 package com.project.gulimallproduct.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
 import io.renren.common.utils.PageUtils;
 import com.project.gulimallproduct.product.entity.AttrGroupEntity;
 
@@ -20,5 +21,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     PageUtils queryPage(Map<String, Object> params,Long catlogId);
 
     PageUtils getAttrRelation(Map<String, Object> params, Long attrgroupId);
+
+    void removeAttrRelation(AttrGroupRelationVo[] asList);
 }
 

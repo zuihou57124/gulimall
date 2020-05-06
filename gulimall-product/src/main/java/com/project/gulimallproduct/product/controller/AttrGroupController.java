@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.project.gulimallproduct.product.entity.CategoryEntity;
 import com.project.gulimallproduct.product.service.CategoryService;
+import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -112,13 +113,13 @@ public class AttrGroupController {
     }
 
     /**
-     * 删除
+     * 删除属性关联，不会删除属性
      */
-    @RequestMapping("/delete")
+    @RequestMapping("/attr/relation/delete")
     //@RequiresPermissions("product:attrgroup:delete")
-    public R delete(@RequestBody Long[] attrGroupIds){
-		attrGroupService.removeByIds(Arrays.asList(attrGroupIds));
-
+    public R delete(@RequestBody AttrGroupRelationVo[] vos){
+		//attrGroupService.removeByIds(Arrays.asList(attrGroupIds));
+        attrGroupService.removeAttrRelation(vos);
         return R.ok();
     }
 

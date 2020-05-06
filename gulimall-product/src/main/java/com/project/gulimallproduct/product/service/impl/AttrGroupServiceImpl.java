@@ -5,8 +5,11 @@ import com.project.gulimallproduct.product.dao.AttrAttrgroupRelationDao;
 import com.project.gulimallproduct.product.dao.AttrDao;
 import com.project.gulimallproduct.product.entity.AttrAttrgroupRelationEntity;
 import com.project.gulimallproduct.product.entity.AttrEntity;
+import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -88,5 +91,24 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                 new QueryWrapper<AttrEntity>().in("attr_id",attrIdList));
 
         return new PageUtils(page);
+    }
+
+
+    /**
+     * 移除关联信息
+     */
+    @Override
+    public void removeAttrRelation(AttrGroupRelationVo[] vos) {
+        List<Long> attrIdList;
+        List<Long> attrGroupList;
+        List<AttrGroupRelationVo> attrGroupRelationVos = Arrays.asList(vos);
+        attrIdList = attrGroupRelationVos.stream()
+                .map((AttrGroupRelationVo::getAttrId)).collect(Collectors.toList());
+        attrGroupList = attrGroupRelationVos.stream()
+                .map((AttrGroupRelationVo::getAttrGroupId)).collect(Collectors.toList());
+
+        QueryWrapper<AttrAttrgroupRelationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("attr_id",attrIdList).in("attr_group_id",attrGroupList);
+        relationDao.delete(queryWrapper);
     }
 }

@@ -72,8 +72,6 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     }
 
-
-
     @Override
     public PageUtils baseQueryPage(Map<String, Object> params, Long catelogId,String attrType) {
 
@@ -194,13 +192,20 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             if(attrGroupRelationEntity.getAttrGroupId()==null){
                 attrGroupRelationEntity.setAttrGroupId((long) 0);
             }
-            attrGroupRelationDao.update(attrGroupRelationEntity,new UpdateWrapper<AttrAttrgroupRelationEntity>()
+            // 如果在属性分组信息中单方面删除关联信息，修改关联信息时需要重新插入关联信息
+            AttrAttrgroupRelationEntity relationEntity = attrGroupRelationDao.selectOne(new UpdateWrapper<AttrAttrgroupRelationEntity>()
                     .eq("attr_id",attrEntity.getAttrId()));
+
+            if(relationEntity!=null){
+                attrGroupRelationDao.update(attrGroupRelationEntity,new UpdateWrapper<AttrAttrgroupRelationEntity>()
+                        .eq("attr_id",attrEntity.getAttrId()));
+            }else {
+                attrGroupRelationDao.insert(attrGroupRelationEntity);
+            }
+
+
         }
-
-
     }
-
 
     /**
      * @param asList 需要删除的属性id列表
