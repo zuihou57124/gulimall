@@ -62,11 +62,14 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrEntity attrEntity = new AttrEntity();
         BeanUtils.copyProperties(attrVo,attrEntity);
         this.save(attrEntity);
-        //保存属性与属性分组之间的联系
-        AttrAttrgroupRelationEntity attrGroupRelationEntity = new AttrAttrgroupRelationEntity();
-        attrGroupRelationEntity.setAttrGroupId(attrVo.getAttrGroupId());
-        attrGroupRelationEntity.setAttrId(attrEntity.getAttrId());
-        attrGroupRelationDao.insert(attrGroupRelationEntity);
+        //保存属性与属性分组之间的联系(销售属性不用保存)
+        if (attrVo.getSearchType()==1){
+            AttrAttrgroupRelationEntity attrGroupRelationEntity = new AttrAttrgroupRelationEntity();
+            attrGroupRelationEntity.setAttrGroupId(attrVo.getAttrGroupId());
+            attrGroupRelationEntity.setAttrId(attrEntity.getAttrId());
+            attrGroupRelationDao.insert(attrGroupRelationEntity);
+        }
+
     }
 
 
@@ -100,13 +103,15 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             );
         }
 
-        List<AttrRespVo> attrRespVoList = null;
+        List<AttrRespVo> attrRespVoList;
+        List<AttrEntity> attrEntityList = page.getRecords();;
 
-        if("base".equalsIgnoreCase(attrType)){
-            List<AttrEntity> attrEntityList = page.getRecords();
-            attrRespVoList = attrEntityList.stream().map((attrEntity) -> {
-                AttrRespVo attrRespVo = new AttrRespVo();
-                BeanUtils.copyProperties(attrEntity, attrRespVo);
+        attrRespVoList = attrEntityList.stream().map((attrEntity) -> {
+            AttrRespVo attrRespVo = new AttrRespVo();
+            BeanUtils.copyProperties(attrEntity, attrRespVo);
+
+            //销售属性不需要分组
+            if("base".equalsIgnoreCase(attrType)){
                 //获取属性属于哪个属性分组id
                 AttrAttrgroupRelationEntity attrGroupRelationEntity =
                         attrGroupRelationDao.selectOne
@@ -119,13 +124,13 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
                     attrRespVo.setAttrGroupId(attrGroupRelationEntity.getAttrGroupId());
                     attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
                 }
+            }
 
-                //获取属性的分类id
-                CategoryEntity categoryEntity = categoryDao.selectById(attrEntity.getCatelogId());
-                attrRespVo.setCatelogName(categoryEntity.getName());
-                return attrRespVo;
-            }).collect(Collectors.toList());
-        }
+            //获取属性的分类id
+            CategoryEntity categoryEntity = categoryDao.selectById(attrEntity.getCatelogId());
+            attrRespVo.setCatelogName(categoryEntity.getName());
+            return attrRespVo;
+        }).collect(Collectors.toList());
 
         pageUtils = new PageUtils(page);
         pageUtils.setList(attrRespVoList);
@@ -176,7 +181,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrEntity attrEntity = new AttrEntity();
         BeanUtils.copyProperties(attrVo,attrEntity);
         this.updateById(attrEntity);
-        //更新属性与属性分组之间的联系
+        //更新属性与属性分组之间的联系(销售属性不用更新)
         AttrAttrgroupRelationEntity attrGroupRelationEntity = new AttrAttrgroupRelationEntity();
         attrGroupRelationEntity.setAttrId(attrEntity.getAttrId());
         attrGroupRelationEntity.setAttrGroupId(attrVo.getAttrGroupId());
