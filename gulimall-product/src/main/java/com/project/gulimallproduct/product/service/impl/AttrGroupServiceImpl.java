@@ -4,15 +4,16 @@ package com.project.gulimallproduct.product.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.project.gulimallproduct.product.dao.AttrAttrgroupRelationDao;
 import com.project.gulimallproduct.product.dao.AttrDao;
+import com.project.gulimallproduct.product.dao.CategoryDao;
 import com.project.gulimallproduct.product.entity.AttrAttrgroupRelationEntity;
 import com.project.gulimallproduct.product.entity.AttrEntity;
+import com.project.gulimallproduct.product.entity.CategoryEntity;
 import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +25,7 @@ import com.project.gulimallproduct.product.dao.AttrGroupDao;
 import com.project.gulimallproduct.product.entity.AttrGroupEntity;
 import com.project.gulimallproduct.product.service.AttrGroupService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 
@@ -38,6 +40,12 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Autowired(required = false)
     AttrDao attrDao;
+
+    @Autowired(required = false)
+    CategoryDao categoryDao;
+
+    @Autowired(required = false)
+    AttrGroupDao attrGroupDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -113,5 +121,47 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         List<AttrGroupRelationVo> attrGroupRelationVos = Arrays.asList(vos);
 
         relationDao.deleteRelation(attrGroupRelationVos);
+    }
+
+
+    /**
+     * 获取未关联的属性列表
+     * 1. 没有被关联
+     * 2. 属于当前商品分类
+     */
+    @Override
+    public PageUtils getAttrNoRelation(Map<String, Object> params, Long attrgroupId) {
+
+        AttrGroupEntity attrGroup = attrGroupDao.selectById(attrgroupId);
+        Page<AttrEntity> page = new Page<>();
+        page.setRecords(null);
+        if(!ObjectUtils.isEmpty(attrGroup)){
+            CategoryEntity category = categoryDao.selectById(attrGroup.getCatelogId());
+            if(!ObjectUtils.isEmpty(category)){
+                //第一步，获取当前商品分类下的全部属性
+                List<AttrEntity> attrList = attrDao.selectList(new QueryWrapper<AttrEntity>().eq("catelog_id",category.getCatId()));
+                //然后 找出未关联的属性
+                //有两种方法，1.一个个去数据库对比，
+                // 2.直接从数据库查出所有，然后进行对比
+                // 选择2,减少数据库的压力
+                //获取所有已经关联的属性id
+                List<Long> relationAttrList = relationDao.selectList(null)
+                        .stream()
+                        .map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
+
+                //判断属性是否被关联
+                attrList = attrList.stream().map((obj)->{
+                    if(!relationAttrList.contains(obj.getAttrId())){
+                        return obj;
+                    }
+                    return null;
+                }).collect(Collectors.toList());
+                //将为空的属性移除
+                attrList.removeIf(Objects::isNull);
+                page.setRecords(attrList);
+            }
+        }
+
+        return new PageUtils(page);
     }
 }

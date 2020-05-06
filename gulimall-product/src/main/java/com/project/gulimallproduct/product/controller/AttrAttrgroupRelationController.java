@@ -4,11 +4,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import com.project.gulimallproduct.product.entity.AttrAttrgroupRelationEntity;
 import com.project.gulimallproduct.product.service.AttrAttrgroupRelationService;
@@ -56,7 +53,7 @@ public class AttrAttrgroupRelationController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     //@RequiresPermissions("product:attrattrgrouprelation:save")
     public R save(@RequestBody AttrAttrgroupRelationEntity attrAttrgroupRelation){
 		attrAttrgroupRelationService.save(attrAttrgroupRelation);
@@ -67,7 +64,7 @@ public class AttrAttrgroupRelationController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @PostMapping("/update")
     //@RequiresPermissions("product:attrattrgrouprelation:update")
     public R update(@RequestBody AttrAttrgroupRelationEntity attrAttrgroupRelation){
 		attrAttrgroupRelationService.updateById(attrAttrgroupRelation);
@@ -78,7 +75,7 @@ public class AttrAttrgroupRelationController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
+    @PostMapping("/delete")
     //@RequiresPermissions("product:attrattrgrouprelation:delete")
     public R delete(@RequestBody Long[] ids){
 		attrAttrgroupRelationService.removeByIds(Arrays.asList(ids));

@@ -10,11 +10,7 @@ import io.renren.validGroup.UpdateStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.project.gulimallproduct.product.entity.BrandEntity;
 import com.project.gulimallproduct.product.service.BrandService;
 import io.renren.common.utils.PageUtils;
@@ -63,7 +59,7 @@ public class BrandController {
      * @Valid 开启校验
      * result 获得校验结果信息
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     //@RequiresPermissions("product:brand:save")
     public R save(@Validated(value = {Add.class}) @RequestBody BrandEntity brand/*, BindingResult result*/){
         brandService.save(brand);
@@ -73,7 +69,7 @@ public class BrandController {
     /**
      * 修改品牌名时，其他关联表的品牌名也应该同步更新
      */
-    @RequestMapping("/update")
+    @PostMapping("/update")
     //@RequiresPermissions("product:brand:update")
     public R update(@Validated(value = {Update.class}) @RequestBody BrandEntity brand){
 		//brandService.updateById(brand);
@@ -84,7 +80,7 @@ public class BrandController {
     /**
      * 修改显示状态
      */
-    @RequestMapping("/update/status")
+    @PostMapping("/update/status")
     //@RequiresPermissions("product:brand:update")
     public R updateStatus(@Validated(value = {UpdateStatus.class}) @RequestBody BrandEntity brand){
         brandService.updateById(brand);
@@ -95,7 +91,7 @@ public class BrandController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
+    @PostMapping("/delete")
     //@RequiresPermissions("product:brand:delete")
     public R delete(@RequestBody Long[] brandIds){
 		brandService.removeByIds(Arrays.asList(brandIds));

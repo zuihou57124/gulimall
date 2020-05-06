@@ -8,10 +8,7 @@ import java.util.List;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.project.gulimallproduct.product.entity.CategoryEntity;
 import com.project.gulimallproduct.product.service.CategoryService;
@@ -58,7 +55,7 @@ public class CategoryController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     //@RequiresPermissions("product:category:save")
     public R save(@RequestBody CategoryEntity category){
 		categoryService.save(category);
@@ -69,7 +66,7 @@ public class CategoryController {
     /**
      * 修改分类名时，其他关联表的分类名也应该同步更新
      */
-    @RequestMapping("/update")
+    @PostMapping("/update")
     //@RequiresPermissions("product:category:update")
     public R update(@RequestBody CategoryEntity category){
 		//categoryService.updateById(category);
@@ -80,7 +77,7 @@ public class CategoryController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
+    @PostMapping("/delete")
     //@RequiresPermissions("product:category:delete")
     public R delete(@RequestBody Long[] catIds){
 		categoryService.removeByIds(Arrays.asList(catIds));

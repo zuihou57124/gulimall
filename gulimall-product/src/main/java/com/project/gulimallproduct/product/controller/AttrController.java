@@ -6,11 +6,7 @@ import java.util.Map;
 import com.project.gulimallproduct.product.vo.AttrRespVo;
 import com.project.gulimallproduct.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.project.gulimallproduct.product.entity.AttrEntity;
 import com.project.gulimallproduct.product.service.AttrService;
@@ -84,7 +80,7 @@ public class AttrController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     //@RequiresPermissions("product:attr:save")
     public R save(@RequestBody AttrVo attrVo){
 		//attrService.save(attr);
@@ -95,7 +91,7 @@ public class AttrController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @PostMapping("/update")
     //@RequiresPermissions("product:attr:update")
     public R update(@RequestBody AttrVo attrVo){
 		//attrService.updateById(attr);
@@ -106,7 +102,7 @@ public class AttrController {
     /**
      * 删除一条属性时，应该同时删除与属性分组的关联信息
      */
-    @RequestMapping("/delete")
+    @PostMapping("/delete")
     //@RequiresPermissions("product:attr:delete")
     public R delete(@RequestBody Long[] attrIds){
 		//attrService.removeByIds(Arrays.asList(attrIds));

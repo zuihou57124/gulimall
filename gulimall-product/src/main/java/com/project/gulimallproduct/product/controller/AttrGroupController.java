@@ -45,6 +45,17 @@ public class AttrGroupController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 获取未关联的的属性列表
+     */
+    @RequestMapping("/{attrgroupId}/noattr/relation")
+    //@RequiresPermissions("product:attrgroup:list")
+    public R noRelationAttrList(@RequestParam Map<String, Object> params,
+                              @PathVariable("attrgroupId") Long attrgroupId){
+        //PageUtils page = attrGroupService.queryPage(params);
+        PageUtils page = attrGroupService.getAttrNoRelation(params,attrgroupId);
+        return R.ok().put("page", page);
+    }
 
     /**
      * 列表
@@ -89,7 +100,7 @@ public class AttrGroupController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     //@RequiresPermissions("product:attrgroup:save")
     public R save(@RequestBody AttrGroupEntity attrGroup){
 		attrGroupService.save(attrGroup);
@@ -100,7 +111,7 @@ public class AttrGroupController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @PostMapping("/update")
     //@RequiresPermissions("product:attrgroup:update")
     public R update(@RequestBody AttrGroupEntity attrGroup){
 		attrGroupService.updateById(attrGroup);
