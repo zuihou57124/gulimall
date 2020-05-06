@@ -33,15 +33,28 @@ public class AttrController {
     private AttrService attrService;
 
     /**
-     * 列表
+     * 规格参数列表
      */
-    @RequestMapping("/base/list/{catelogId}")
+    /*@RequestMapping("/base/list/{catelogId}")
     //@RequiresPermissions("product:attr:list")
     public R baseList(@RequestParam Map<String, Object> params,
                       @PathVariable ("catelogId") Long catelogId)
     {
         PageUtils page = attrService.baseQueryPage(params,catelogId);
 
+        return R.ok().put("page", page);
+    }
+*/
+    /**
+     * 属性列表
+     */
+    @RequestMapping("/{attrType}/list/{catelogId}")
+    //@RequiresPermissions("product:attr:list")
+    public R saleList(@RequestParam Map<String, Object> params,
+                      @PathVariable ("catelogId") Long catelogId,
+                      @PathVariable ("attrType") String attrType)
+    {
+        PageUtils page = attrService.baseQueryPage(params, catelogId,attrType);
         return R.ok().put("page", page);
     }
 
@@ -84,20 +97,20 @@ public class AttrController {
      */
     @RequestMapping("/update")
     //@RequiresPermissions("product:attr:update")
-    public R update(@RequestBody AttrEntity attr){
-		attrService.updateById(attr);
-
+    public R update(@RequestBody AttrVo attrVo){
+		//attrService.updateById(attr);
+        attrService.updateAttr(attrVo);
         return R.ok();
     }
 
     /**
-     * 删除
+     * 删除一条属性时，应该同时删除与属性分组的关联信息
      */
     @RequestMapping("/delete")
     //@RequiresPermissions("product:attr:delete")
     public R delete(@RequestBody Long[] attrIds){
-		attrService.removeByIds(Arrays.asList(attrIds));
-
+		//attrService.removeByIds(Arrays.asList(attrIds));
+        attrService.removeAttr(Arrays.asList(attrIds));
         return R.ok();
     }
 

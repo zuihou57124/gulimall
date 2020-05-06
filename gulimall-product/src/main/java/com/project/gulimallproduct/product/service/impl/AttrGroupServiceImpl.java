@@ -14,6 +14,9 @@ import com.project.gulimallproduct.product.service.AttrGroupService;
 import org.springframework.util.StringUtils;
 
 
+/**
+ * @author qcw
+ */
 @Service("attrGroupService")
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService {
 

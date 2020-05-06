@@ -6,6 +6,8 @@ import com.project.gulimallproduct.product.vo.AttrVo;
 import io.renren.common.utils.PageUtils;
 import com.project.gulimallproduct.product.entity.AttrEntity;
 
+import javax.print.DocFlavor;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,11 +21,15 @@ public interface AttrService extends IService<AttrEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
-
     void saveAttr(AttrVo attrVo);
 
-    PageUtils baseQueryPage(Map<String, Object> params,Long catelogId);
+    PageUtils baseQueryPage(Map<String, Object> params, Long catelogId, String attrType);
 
     AttrRespVo getAttrVo(Long attrId);
+
+    void updateAttr(AttrVo attrVo);
+
+    void removeAttr(List<Long> asList);
+
 }
 
