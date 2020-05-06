@@ -1,6 +1,5 @@
 package com.project.gulimallproduct.product.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.project.gulimallproduct.product.dao.AttrAttrgroupRelationDao;
 import com.project.gulimallproduct.product.dao.AttrGroupDao;

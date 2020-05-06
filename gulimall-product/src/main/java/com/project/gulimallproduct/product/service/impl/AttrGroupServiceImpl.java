@@ -1,6 +1,7 @@
 package com.project.gulimallproduct.product.service.impl;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.project.gulimallproduct.product.dao.AttrAttrgroupRelationDao;
 import com.project.gulimallproduct.product.dao.AttrDao;
 import com.project.gulimallproduct.product.entity.AttrAttrgroupRelationEntity;
@@ -22,6 +23,7 @@ import io.renren.common.utils.Query;
 import com.project.gulimallproduct.product.dao.AttrGroupDao;
 import com.project.gulimallproduct.product.entity.AttrGroupEntity;
 import com.project.gulimallproduct.product.service.AttrGroupService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 
@@ -86,9 +88,16 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                 (AttrAttrgroupRelationEntity::getAttrId)
         ).collect(Collectors.toList());
 
-        IPage<AttrEntity> page = attrDao.selectPage(
-                new Query<AttrEntity>().getPage(params),
-                new QueryWrapper<AttrEntity>().in("attr_id",attrIdList));
+        IPage<AttrEntity> page;
+
+        if(attrIdList.size() > 0){
+            page = attrDao.selectPage(
+                    new Query<AttrEntity>().getPage(params),
+                    new QueryWrapper<AttrEntity>().in("attr_id",attrIdList));
+        }else {
+            page = new Page<>();
+            page.setRecords(null);
+        }
 
         return new PageUtils(page);
     }
@@ -97,18 +106,12 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     /**
      * 移除关联信息
      */
+    @Transactional
     @Override
     public void removeAttrRelation(AttrGroupRelationVo[] vos) {
-        List<Long> attrIdList;
-        List<Long> attrGroupList;
-        List<AttrGroupRelationVo> attrGroupRelationVos = Arrays.asList(vos);
-        attrIdList = attrGroupRelationVos.stream()
-                .map((AttrGroupRelationVo::getAttrId)).collect(Collectors.toList());
-        attrGroupList = attrGroupRelationVos.stream()
-                .map((AttrGroupRelationVo::getAttrGroupId)).collect(Collectors.toList());
 
-        QueryWrapper<AttrAttrgroupRelationEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("attr_id",attrIdList).in("attr_group_id",attrGroupList);
-        relationDao.delete(queryWrapper);
+        List<AttrGroupRelationVo> attrGroupRelationVos = Arrays.asList(vos);
+
+        relationDao.deleteRelation(attrGroupRelationVos);
     }
 }
