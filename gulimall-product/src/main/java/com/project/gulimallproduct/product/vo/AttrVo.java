@@ -50,4 +50,9 @@ public class AttrVo {
      * 所属的属性分组id
      */
     private Long attrGroupId;
+
+    /**
+     * 是否可以多选
+     */
+    private Integer valueType;
 }
