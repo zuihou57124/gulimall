@@ -9,6 +9,7 @@ import com.project.gulimallproduct.product.entity.AttrAttrgroupRelationEntity;
 import com.project.gulimallproduct.product.entity.AttrEntity;
 import com.project.gulimallproduct.product.entity.CategoryEntity;
 import com.project.gulimallproduct.product.service.AttrAttrgroupRelationService;
+import com.project.gulimallproduct.product.service.AttrService;
 import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Autowired(required = false)
     AttrGroupDao attrGroupDao;
+
+    @Autowired
+    AttrService attrService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -137,8 +141,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     public PageUtils getAttrNoRelation(Map<String, Object> params, Long attrgroupId) {
 
         AttrGroupEntity attrGroup = attrGroupDao.selectById(attrgroupId);
-        Page<AttrEntity> page = new Page<>();
-        page.setRecords(null);
+        IPage<AttrEntity> page = new Page<>();
         if(!ObjectUtils.isEmpty(attrGroup)){
             CategoryEntity category = categoryDao.selectById(attrGroup.getCatelogId());
             if(!ObjectUtils.isEmpty(category)){
@@ -153,10 +156,24 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                         .stream()
                         .map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
 
-                List<AttrEntity> attrList = attrDao.selectList(new QueryWrapper<AttrEntity>().eq("catelog_id",category.getCatId())
-                        .eq("search_type",1).notIn("attr_id",relationAttrList));
+                //List<AttrEntity> attrList = attrDao.selectList(new QueryWrapper<AttrEntity>().eq("catelog_id",category.getCatId())
+                     //   .eq("search_type",1).notIn("attr_id",relationAttrList));
 
-                page.setRecords(attrList);
+                QueryWrapper<AttrEntity> wrapper = new QueryWrapper<AttrEntity>().eq("catelog_id",category.getCatId())
+                        .eq("search_type",1);
+
+                if(relationAttrList.size() > 0){
+                    wrapper.notIn("attr_id",relationAttrList);
+                }
+                String key = (String) params.get("key");
+                if(!StringUtils.isEmpty(key)){
+                    wrapper.and((obj->{
+                        obj.eq("attr_id",key)
+                           .or()
+                           .like("attr_name",key);
+                    }));
+                }
+                page = attrService.page(new Query<AttrEntity>().getPage(params), wrapper);
             }
         }
 
