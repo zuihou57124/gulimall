@@ -63,10 +63,13 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         this.save(attrEntity);
         //保存属性与属性分组之间的联系(销售属性不用保存)
         if (attrVo.getSearchType()==1){
-            AttrAttrgroupRelationEntity attrGroupRelationEntity = new AttrAttrgroupRelationEntity();
-            attrGroupRelationEntity.setAttrGroupId(attrVo.getAttrGroupId());
-            attrGroupRelationEntity.setAttrId(attrEntity.getAttrId());
-            attrGroupRelationDao.insert(attrGroupRelationEntity);
+            if(attrVo.getAttrGroupId()!=null){
+                AttrAttrgroupRelationEntity attrGroupRelationEntity = new AttrAttrgroupRelationEntity();
+                attrGroupRelationEntity.setAttrGroupId(attrVo.getAttrGroupId());
+                attrGroupRelationEntity.setAttrId(attrEntity.getAttrId());
+                attrGroupRelationDao.insert(attrGroupRelationEntity);
+            }
+
         }
 
     }
@@ -186,16 +189,18 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             AttrAttrgroupRelationEntity attrGroupRelationEntity = new AttrAttrgroupRelationEntity();
             attrGroupRelationEntity.setAttrId(attrEntity.getAttrId());
             attrGroupRelationEntity.setAttrGroupId(attrVo.getAttrGroupId());
-            //如果修改前分组属性存在，修改后分组属性不存在，就把分组属性置为0
-            //，等同于null,防止错误关联
-            if(attrGroupRelationEntity.getAttrGroupId()==null){
-                attrGroupRelationEntity.setAttrGroupId((long) 0);
-            }
+
             // 如果在属性分组信息中单方面删除关联信息，修改关联信息时需要重新插入关联信息
             AttrAttrgroupRelationEntity relationEntity = attrGroupRelationDao.selectOne(new UpdateWrapper<AttrAttrgroupRelationEntity>()
                     .eq("attr_id",attrEntity.getAttrId()));
 
             if(relationEntity!=null){
+                //如果修改前分组属性存在，修改后分组属性不存在，就删除分组关联
+                //,进而防止错误关联
+                if(attrGroupRelationEntity.getAttrGroupId()==null){
+                    //attrGroupRelationEntity.setAttrGroupId((long) 0);
+                    attrGroupRelationDao.delete(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id",attrGroupRelationEntity.getAttrId()));
+                }
                 attrGroupRelationDao.update(attrGroupRelationEntity,new UpdateWrapper<AttrAttrgroupRelationEntity>()
                         .eq("attr_id",attrEntity.getAttrId()));
             }else {
