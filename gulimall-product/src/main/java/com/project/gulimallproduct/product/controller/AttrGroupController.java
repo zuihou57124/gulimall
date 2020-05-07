@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.project.gulimallproduct.product.entity.CategoryEntity;
 import com.project.gulimallproduct.product.service.CategoryService;
+import com.project.gulimallproduct.product.vo.AttrAndGroupVo;
 import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,19 @@ public class AttrGroupController {
 
     @Autowired
     private CategoryService categoryService;
+
+
+    /**
+     * 获取某个分类下的规格参数列表(即search_type=1的属性)
+     */
+    @RequestMapping("/{catelogId}/withattr")
+    //@RequiresPermissions("product:attrgroup:list")
+    public R attrList(@RequestParam Map<String, Object> params,
+                              @PathVariable("catelogId") Long catelogId){
+        //PageUtils page = attrGroupService.queryPage(params);
+        List<AttrAndGroupVo> list = attrGroupService.getAttrList(params,catelogId);
+        return R.ok().put("data", list);
+    }
 
 
     /**

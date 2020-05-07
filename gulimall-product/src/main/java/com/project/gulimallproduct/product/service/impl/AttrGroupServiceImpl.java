@@ -10,6 +10,7 @@ import com.project.gulimallproduct.product.entity.AttrEntity;
 import com.project.gulimallproduct.product.entity.CategoryEntity;
 import com.project.gulimallproduct.product.service.AttrAttrgroupRelationService;
 import com.project.gulimallproduct.product.service.AttrService;
+import com.project.gulimallproduct.product.vo.AttrAndGroupVo;
 import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -183,7 +184,6 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     @Override
     public void saveRelation(List<AttrGroupRelationVo> attrVo) {
 
-
         List<AttrAttrgroupRelationEntity> relationEntityList = new ArrayList<>();
         for (AttrGroupRelationVo relationVo:attrVo) {
             AttrAttrgroupRelationEntity relation = new AttrAttrgroupRelationEntity();
@@ -193,5 +193,36 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         }
         relationService.saveBatch(relationEntityList);
 
+    }
+
+    @Override
+    public List<AttrAndGroupVo> getAttrList(Map<String, Object> params, Long catelogId) {
+
+        List<AttrAndGroupVo> attrAndGroupVoList = new ArrayList<>();
+        //获取产品分类下的分组属性
+        List<AttrGroupEntity> attrGroupList = attrGroupDao.selectList(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catelogId));
+        attrGroupList.stream()
+                .map((attrGroup->{
+
+                    //获取分组属性关联的属性信息
+                    List<AttrAttrgroupRelationEntity> relationList = relationDao.selectList(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id",attrGroup.getAttrGroupId()));
+                    List<Long> relationAttrIdList = relationList.stream()
+                            .map((AttrAttrgroupRelationEntity::getAttrId)).
+                            collect(Collectors.toList());
+                    //获取分组下的属性
+                    QueryWrapper<AttrEntity> wrapper = new QueryWrapper<>();
+                    if(relationAttrIdList.size() > 0) {
+                        wrapper.in("attr_id", relationAttrIdList);
+                        List<AttrEntity> attrList = attrDao.selectList(wrapper);
+                        AttrAndGroupVo attrAndGroupVo = new AttrAndGroupVo();
+                        BeanUtils.copyProperties(attrGroup, attrAndGroupVo);
+                        attrAndGroupVo.setAttrs(attrList);
+                        attrAndGroupVoList.add(attrAndGroupVo);
+                    }
+                    return null;
+                }))
+                .collect(Collectors.toList());
+
+        return attrAndGroupVoList;
     }
 }
