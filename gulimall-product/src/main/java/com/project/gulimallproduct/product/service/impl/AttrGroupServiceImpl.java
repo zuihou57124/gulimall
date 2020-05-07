@@ -161,7 +161,6 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
                 QueryWrapper<AttrEntity> wrapper = new QueryWrapper<AttrEntity>().eq("catelog_id",category.getCatId())
                         .eq("search_type",1);
-
                 if(relationAttrList.size() > 0){
                     wrapper.notIn("attr_id",relationAttrList);
                 }

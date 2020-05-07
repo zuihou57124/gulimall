@@ -16,6 +16,11 @@ spring:
     nacos:
       discovery:
         server-addr: 59.110.137.100:8848 #配置Nacos地址
+    alicloud:
+      access-key: LTAI4GCgva5jtoYnBtYEkfV2
+      secret-key: Psx2aEs86ncYoY58HhuQ5ZsAtiUTpD
+      oss:
+        endpoint: oss-cn-shenzhen.aliyuncs.com
 
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
@@ -34,7 +39,5 @@ spring:
 #      min-evictable-idle-time-millis: 300000
 
 
-
-mybatis:
+mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
-

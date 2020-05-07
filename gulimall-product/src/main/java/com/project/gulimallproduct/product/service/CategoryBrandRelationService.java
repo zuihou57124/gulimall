@@ -1,9 +1,12 @@
 package com.project.gulimallproduct.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.project.gulimallproduct.product.entity.BrandEntity;
+import com.project.gulimallproduct.product.vo.BrandVo;
 import io.renren.common.utils.PageUtils;
 import com.project.gulimallproduct.product.entity.CategoryBrandRelationEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,5 +21,7 @@ public interface CategoryBrandRelationService extends IService<CategoryBrandRela
     PageUtils queryPage(Map<String, Object> params);
 
     void saveDetail(CategoryBrandRelationEntity categoryBrandRelation);
+
+    List<BrandEntity> getBrandRelationList(Long catlogId);
 }
 
