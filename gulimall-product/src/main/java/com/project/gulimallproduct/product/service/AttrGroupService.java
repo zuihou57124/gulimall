@@ -5,6 +5,7 @@ import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
 import io.renren.common.utils.PageUtils;
 import com.project.gulimallproduct.product.entity.AttrGroupEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,5 +26,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     void removeAttrRelation(AttrGroupRelationVo[] asList);
 
     PageUtils getAttrNoRelation(Map<String, Object> params, Long attrgroupId);
+
+    void saveRelation(List<AttrGroupRelationVo> attrVo);
 }
 

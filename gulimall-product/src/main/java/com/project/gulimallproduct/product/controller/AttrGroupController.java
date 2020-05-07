@@ -15,6 +15,8 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import sun.plugin.javascript.navig.Array;
 
+import javax.validation.Valid;
+
 
 /**
  * 属性分组
@@ -107,6 +109,18 @@ public class AttrGroupController {
 
         return R.ok();
     }
+
+    /**
+     * 新增关联信息
+     */
+    @PostMapping("/attr/relation")
+    //@RequiresPermissions("product:attrgroup:save")
+    public R saveRelation(@RequestBody @Valid List<AttrGroupRelationVo> attrVo){
+        attrGroupService.saveRelation(attrVo);
+
+        return R.ok();
+    }
+
 
     /**
      * 修改

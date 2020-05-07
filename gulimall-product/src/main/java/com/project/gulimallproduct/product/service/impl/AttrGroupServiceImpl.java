@@ -8,6 +8,7 @@ import com.project.gulimallproduct.product.dao.CategoryDao;
 import com.project.gulimallproduct.product.entity.AttrAttrgroupRelationEntity;
 import com.project.gulimallproduct.product.entity.AttrEntity;
 import com.project.gulimallproduct.product.entity.CategoryEntity;
+import com.project.gulimallproduct.product.service.AttrAttrgroupRelationService;
 import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Autowired(required = false)
     AttrAttrgroupRelationDao relationDao;
+
+    @Autowired
+    AttrAttrgroupRelationService relationService;
 
     @Autowired(required = false)
     AttrDao attrDao;
@@ -169,5 +173,21 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         }
 
         return new PageUtils(page);
+    }
+
+    @Transactional(rollbackFor = {})
+    @Override
+    public void saveRelation(List<AttrGroupRelationVo> attrVo) {
+
+
+        List<AttrAttrgroupRelationEntity> relationEntityList = new ArrayList<>();
+        for (AttrGroupRelationVo relationVo:attrVo) {
+            AttrAttrgroupRelationEntity relation = new AttrAttrgroupRelationEntity();
+            relation.setAttrId(relationVo.getAttrId());
+            relation.setAttrGroupId(relationVo.getAttrGroupId());
+            relationEntityList.add(relation);
+        }
+        relationService.saveBatch(relationEntityList);
+
     }
 }

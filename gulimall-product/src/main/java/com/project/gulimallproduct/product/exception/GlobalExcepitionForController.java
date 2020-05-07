@@ -36,12 +36,12 @@ public class GlobalExcepitionForController {
         return R.error(ExceptionCode.VALID_EXCEPTION.getCode(),ExceptionCode.VALID_EXCEPTION.getMessage()).put("data",map);
     }
 
-    @ResponseBody
+    /*@ResponseBody
     @ExceptionHandler(value = Throwable.class)
     public R handleExecption(Throwable t){
         log.error("全局异常{},异常{}",t.getMessage(),t.getClass());
 
         return R.error(ExceptionCode.UNKNOW_EXCEPTION.getCode(),ExceptionCode.UNKNOW_EXCEPTION.getMessage());
-    }
+    }*/
 
 }
