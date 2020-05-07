@@ -143,8 +143,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             CategoryEntity category = categoryDao.selectById(attrGroup.getCatelogId());
             if(!ObjectUtils.isEmpty(category)){
                 //第一步，获取当前商品分类下的全部属性(必须是规格参数，不能是销售属性)
-                List<AttrEntity> attrList = attrDao.selectList(new QueryWrapper<AttrEntity>().eq("catelog_id",category.getCatId())
-                                            .eq("search_type",1));
+
                 //然后 找出未关联的属性
                 //有两种方法，1.一个个去数据库对比，
                 // 2.直接从数据库查出所有，然后进行对比
@@ -154,20 +153,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                         .stream()
                         .map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
 
-                //判断属性是否被关联
-                attrList = attrList.stream().map((obj)->{
-                    if(!relationAttrList.contains(obj.getAttrId())){
-                        return obj;
-                    }
-//                    else {
-//                        if((relationAttrList.contains(obj.getAttrId())&&(obj.getAttrId()==0||obj.getAttrId()==null))){
-//                            return obj;
-//                        }
-//                    }
-                    return null;
-                }).collect(Collectors.toList());
-                //将为空的属性移除
-                attrList.removeIf(Objects::isNull);
+                List<AttrEntity> attrList = attrDao.selectList(new QueryWrapper<AttrEntity>().eq("catelog_id",category.getCatId())
+                        .eq("search_type",1).notIn("attr_id",relationAttrList));
+
                 page.setRecords(attrList);
             }
         }

@@ -204,10 +204,12 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
                 attrGroupRelationDao.update(attrGroupRelationEntity,new UpdateWrapper<AttrAttrgroupRelationEntity>()
                         .eq("attr_id",attrEntity.getAttrId()));
             }else {
-                attrGroupRelationDao.insert(attrGroupRelationEntity);
+                //如果修改前属性未被关联，判断修改后是否被关联，如果是，创建关联关系
+                if(attrGroupRelationEntity.getAttrGroupId()!=null){
+                    attrGroupRelationDao.insert(attrGroupRelationEntity);
+                }
+
             }
-
-
         }
     }
 
