@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @MapperScan("com.project.gulimallproduct.product.dao")
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.project.gulimallproduct.product.feign")
 @EnableTransactionManagement
 public class GulimallProductApplication {
 
