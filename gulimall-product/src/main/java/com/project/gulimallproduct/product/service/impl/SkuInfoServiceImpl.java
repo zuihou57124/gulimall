@@ -50,9 +50,41 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<SkuInfoEntity> queryWrapper = new QueryWrapper<>();
+
+        String key = (String) params.get("key");
+        String catelogId = (String) params.get("catelogId");
+        String brandId = (String) params.get("brandId");
+        String min = (String) params.get("min");
+        String max = (String) params.get("max");
+
+        if(!StringUtils.isEmpty(key)){
+            queryWrapper.and((wrapper->{
+                wrapper.eq("sku_id",key)
+                        .or()
+                        .like("sku_name",key);
+            }));
+        }
+
+        if(!StringUtils.isEmpty(catelogId) && !"0".equals(catelogId)){
+            queryWrapper.eq("catalog_id",catelogId);
+        }
+
+        if(!StringUtils.isEmpty(brandId) && !"0".equals(brandId)){
+            queryWrapper.eq("brand_id",brandId);
+        }
+
+        if(!StringUtils.isEmpty(min)){
+            queryWrapper.ge("price",min);
+        }
+
+        if(!StringUtils.isEmpty(max) && new BigDecimal(max).compareTo(BigDecimal.valueOf(0))>0){
+            queryWrapper.le("price",max);
+        }
+
         IPage<SkuInfoEntity> page = this.page(
                 new Query<SkuInfoEntity>().getPage(params),
-                new QueryWrapper<SkuInfoEntity>()
+                queryWrapper
         );
 
         return new PageUtils(page);
@@ -110,7 +142,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
                 BeanUtils.copyProperties(sku,skuReductionTo);
                 skuReductionTo.setSkuId(skuInfo.getSkuId());
                 //满减限制,如果小于0，不调用远程服务
-                if(skuReductionTo.getFullCount()>0 && skuReductionTo.getFullPrice().compareTo(new BigDecimal("0")) > 0){
+                if(skuReductionTo.getFullCount()>0 || skuReductionTo.getFullPrice().compareTo(new BigDecimal("0")) > 0){
                     R r = couponFeignService.saveSkuReduction(skuReductionTo);
                     if(r.getCode()!=0){
                         log.error("sku 优惠满减信息服务远程调用失败");

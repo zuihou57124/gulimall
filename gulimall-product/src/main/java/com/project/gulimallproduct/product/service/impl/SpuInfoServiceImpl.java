@@ -10,6 +10,7 @@ import com.project.gulimallproduct.product.vo.SpuSaveVo;
 import io.renren.common.to.SkuReductionTo;
 import io.renren.common.to.SpuBoundTo;
 import io.renren.common.utils.R;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -125,6 +126,49 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         this.baseMapper.insert(spuInfo);
 
+    }
+
+
+    /**
+     * @param params 查询条件
+     * @return spu列表
+     */
+    @Override
+    public PageUtils spuInfoList(Map<String, Object> params) {
+
+        QueryWrapper<SpuInfoEntity> queryWrapper = new QueryWrapper<>();
+
+        String key = (String) params.get("key");
+        String catelogId = (String) params.get("catelogId");
+        String brandId = (String) params.get("brandId");
+        String status = (String) params.get("status");
+
+        if(!StringUtils.isEmpty(key)){
+            queryWrapper.and((wrapper->{
+                wrapper.eq("id",key)
+                        .or()
+                        .like("spu_name",key);
+            }));
+        }
+
+        if(!StringUtils.isEmpty(catelogId)){
+            queryWrapper.eq("catalog_id",catelogId);
+        }
+
+        if(!StringUtils.isEmpty(brandId)){
+            queryWrapper.eq("brand_id",brandId);
+        }
+
+        if(!StringUtils.isEmpty(status)){
+            //queryWrapper.eq("publish_status",status);
+        }
+
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                queryWrapper
+        );
+
+        return new PageUtils(page);
     }
 
 }
