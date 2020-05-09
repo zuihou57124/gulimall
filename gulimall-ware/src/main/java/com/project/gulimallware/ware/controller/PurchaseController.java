@@ -30,6 +30,9 @@ public class PurchaseController {
     private PurchaseService purchaseService;
 
 
+
+
+
     /**
      * 员工领取采购单
      */
@@ -39,7 +42,6 @@ public class PurchaseController {
         //PageUtils page = purchaseService.queryPage(params);
         purchaseService.received(purchaseIds);
         return R.ok();
-
     }
 
     /**

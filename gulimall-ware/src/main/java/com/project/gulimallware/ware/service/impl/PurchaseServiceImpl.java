@@ -79,20 +79,24 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
             return purchaseDetailEntity.getStatus()==WareConst.PurchaseDetailStatusEnum.CREATED.getCode() || purchaseDetailEntity.getStatus()==WareConst.PurchaseDetailStatusEnum.ASSIGNED.getCode();
         })).collect(Collectors.toList());
 
-        purchaseDetailLsit = items.stream().map(
-                (id-> {
-                    PurchaseDetailEntity purchaseDetail = new PurchaseDetailEntity();
-                    purchaseDetail.setId(id);
-                    purchaseDetail.setStatus(WareConst.PurchaseDetailStatusEnum.ASSIGNED.getCode());
-                    purchaseDetail.setPurchaseId(purchase.getId());
-                    return  purchaseDetail;
+        purchaseDetailLsit = purchaseDetailLsit.stream().filter(
+                (purchaseDetailEntity -> {
+
+                    if (purchaseDetailEntity.getStatus()==WareConst.PurchaseDetailStatusEnum.CREATED.getCode()
+                           || purchaseDetailEntity.getStatus()==WareConst.PurchaseDetailStatusEnum.ASSIGNED.getCode()){
+                        purchaseDetailEntity.setPurchaseId(purchase.getId());
+                        purchaseDetailEntity.setStatus(WareConst.PurchaseDetailStatusEnum.ASSIGNED.getCode());
+                        return true;
+                    }
+                    return false;
                 }))
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
 
         purchaseDetailService.updateBatchById(purchaseDetailLsit);
         purchase.setUpdateTime(new Date());
-        this.updateById(purchase);
-
+        if(purchaseDetailLsit.size()>0){
+            this.updateById(purchase);
+        }
     }
 
     @Transactional(rollbackFor = {})
