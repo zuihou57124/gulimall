@@ -1,8 +1,11 @@
 package com.project.gulimallware.ware.service.impl;
 
 import com.project.gulimallware.ware.entity.PurchaseDetailEntity;
+import com.project.gulimallware.ware.entity.WareSkuEntity;
 import com.project.gulimallware.ware.service.PurchaseDetailService;
+import com.project.gulimallware.ware.service.WareSkuService;
 import com.project.gulimallware.ware.vo.MergeVo;
+import com.project.gulimallware.ware.vo.PurchaseDoneVo;
 import io.renren.common.myconst.WareConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,9 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
 
     @Autowired
     PurchaseDetailService purchaseDetailService;
+
+    @Autowired
+    WareSkuService wareSkuService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -133,6 +139,54 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
         })).collect(Collectors.toList());
 
         this.updateBatchById(purchaseList);
+    }
+
+    @Transactional(rollbackFor = {})
+    @Override
+    public void purchaseDone(PurchaseDoneVo purchaseDoneVo) {
+
+       // 1.改变采购单的状态 (所有采购项都完成，采购单才能完成)
+        Long purchaseId = purchaseDoneVo.getId();
+
+        // 2.改变采购选项的状态
+        final Boolean[] isSuccess = {true};
+        List<PurchaseDetailEntity> purchaseDetailEntityList = purchaseDoneVo.getItems().stream().map((purchaseItemDoneVo -> {
+            if (purchaseItemDoneVo.getStatus()==WareConst.PurchaseDetailStatusEnum.ERROR.getCode()){
+                isSuccess[0] = false;
+            }
+            PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+            //purchaseDetailEntity.setPurchaseId(purchaseId);
+            //purchaseDetailEntity.setId(purchaseItemDoneVo.getItemId());
+            purchaseDetailEntity = purchaseDetailService.getById(purchaseItemDoneVo.getItemId());
+            purchaseDetailEntity.setStatus(purchaseItemDoneVo.getStatus());
+            return purchaseDetailEntity;
+        }))
+        .filter((purchaseDetailEntity -> {
+            return purchaseDetailEntity.getStatus()==WareConst.PurchaseDetailStatusEnum.DONE.getCode();
+        }))
+        .collect(Collectors.toList());
+        //改变采购选项的状态
+        purchaseDetailService.updateBatchById(purchaseDetailEntityList);
+        //改变采购单的状态
+        PurchaseEntity purchaseEntity = this.getById(purchaseId);
+        if(isSuccess[0]){
+            purchaseEntity.setStatus(WareConst.PurchaseStatusEnum.DONE.getCode());
+        }
+        else {
+            purchaseEntity.setStatus(WareConst.PurchaseStatusEnum.ERROR.getCode());
+        }
+
+        //3.入库
+        purchaseDetailEntityList.forEach((purchaseDetailEntity -> {
+            WareSkuEntity wareSkuEntity = new WareSkuEntity();
+            wareSkuEntity.setSkuId(purchaseDetailEntity.getSkuId());
+            wareSkuEntity.setWareId(purchaseDetailEntity.getWareId());
+            wareSkuEntity.setStock(purchaseDetailEntity.getSkuNum());
+            System.out.println("进入map映射");
+            wareSkuService.addStock(wareSkuEntity);
+            //return wareSkuEntity;
+        }));
+
     }
 
 }

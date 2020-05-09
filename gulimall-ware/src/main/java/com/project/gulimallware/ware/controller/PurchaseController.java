@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.project.gulimallware.ware.vo.MergeVo;
+import com.project.gulimallware.ware.vo.PurchaseDoneVo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,16 @@ public class PurchaseController {
     private PurchaseService purchaseService;
 
 
-
+    /**
+     * 员工完成采购单
+     */
+    @PostMapping("/done")
+    //@RequiresPermissions("ware:purchase:list")
+    public R done(@RequestBody PurchaseDoneVo purchaseDoneVo) {
+        //PageUtils page = purchaseService.queryPage(params);
+        purchaseService.purchaseDone(purchaseDoneVo);
+        return R.ok();
+    }
 
 
     /**

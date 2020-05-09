@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients("com.project.gulimallware.ware.feign")
 @EnableTransactionManagement
 @MapperScan("com.project.gulimallware.ware.dao")
 public class GulimallWareApplication {

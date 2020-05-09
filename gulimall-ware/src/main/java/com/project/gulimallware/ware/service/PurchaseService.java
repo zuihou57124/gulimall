@@ -2,6 +2,7 @@ package com.project.gulimallware.ware.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.project.gulimallware.ware.vo.MergeVo;
+import com.project.gulimallware.ware.vo.PurchaseDoneVo;
 import io.renren.common.utils.PageUtils;
 import com.project.gulimallware.ware.entity.PurchaseEntity;
 
@@ -24,5 +25,7 @@ public interface PurchaseService extends IService<PurchaseEntity> {
     void merge(MergeVo mergeVo);
 
     void received(List<Long> purchaseIds);
+
+    void purchaseDone(PurchaseDoneVo purchaseDoneVo);
 }
 
