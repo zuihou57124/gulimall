@@ -2,15 +2,17 @@ package com.project.gulimallware.ware.service.impl;
 
 import com.project.gulimallware.ware.entity.PurchaseDetailEntity;
 import com.project.gulimallware.ware.entity.WareSkuEntity;
+import com.project.gulimallware.ware.feign.SkuInfoFeignService;
 import com.project.gulimallware.ware.service.PurchaseDetailService;
 import com.project.gulimallware.ware.service.WareSkuService;
 import com.project.gulimallware.ware.vo.MergeVo;
 import com.project.gulimallware.ware.vo.PurchaseDoneVo;
 import io.renren.common.myconst.WareConst;
+import io.renren.common.to.SkuTo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,9 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
 
     @Autowired
     WareSkuService wareSkuService;
+
+    @Autowired
+    SkuInfoFeignService skuInfoFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -145,7 +150,7 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
     @Override
     public void purchaseDone(PurchaseDoneVo purchaseDoneVo) {
 
-       // 1.改变采购单的状态 (所有采购项都完成，采购单才能完成)
+        // 1.改变采购单的状态 (所有采购项都完成，采购单才能完成)
         Long purchaseId = purchaseDoneVo.getId();
 
         // 2.改变采购选项的状态
@@ -159,10 +164,33 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
             //purchaseDetailEntity.setId(purchaseItemDoneVo.getItemId());
             purchaseDetailEntity = purchaseDetailService.getById(purchaseItemDoneVo.getItemId());
             purchaseDetailEntity.setStatus(purchaseItemDoneVo.getStatus());
+
+            if(purchaseDetailEntity.getStatus()==WareConst.PurchaseDetailStatusEnum.DONE.getCode()){
+
+                WareSkuEntity wareSkuEntity = new WareSkuEntity();
+                Map<String, SkuTo> r = skuInfoFeignService.skuInfo(purchaseDetailEntity.getSkuId());
+                if(r.get("skuTo")==null){
+                    log.error("sku远程服务调用失败");
+                }else {
+                    SkuTo skuTo = (SkuTo) r.get("skuTo");
+                    wareSkuEntity.setSkuName(skuTo.getSkuName());
+                    //设置采购选项的总金额
+                    BigDecimal price = skuTo.getPrice();
+                    BigDecimal toatl = price.multiply(new BigDecimal(purchaseDetailEntity.getSkuNum()));
+                    purchaseDetailEntity.setSkuPrice(toatl);
+                    //将采购选项的商品入库
+                    wareSkuEntity.setSkuId(purchaseDetailEntity.getSkuId());
+                    wareSkuEntity.setWareId(purchaseDetailEntity.getWareId());
+                    wareSkuEntity.setStock(purchaseDetailEntity.getSkuNum());
+                    wareSkuEntity.setSkuName(skuTo.getSkuName());
+                    wareSkuService.addStock(wareSkuEntity);
+                }
+            }
             return purchaseDetailEntity;
         }))
         .filter((purchaseDetailEntity -> {
-            return purchaseDetailEntity.getStatus()==WareConst.PurchaseDetailStatusEnum.DONE.getCode();
+            return purchaseDetailEntity.getStatus()==WareConst.PurchaseDetailStatusEnum.DONE.getCode()
+                   || purchaseDetailEntity.getStatus()==WareConst.PurchaseDetailStatusEnum.ERROR.getCode();
         }))
         .collect(Collectors.toList());
         //改变采购选项的状态
@@ -177,15 +205,14 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
         }
 
         //3.入库
-        purchaseDetailEntityList.forEach((purchaseDetailEntity -> {
+        /*purchaseDetailEntityList.forEach((purchaseDetailEntity -> {
             WareSkuEntity wareSkuEntity = new WareSkuEntity();
             wareSkuEntity.setSkuId(purchaseDetailEntity.getSkuId());
             wareSkuEntity.setWareId(purchaseDetailEntity.getWareId());
             wareSkuEntity.setStock(purchaseDetailEntity.getSkuNum());
-            System.out.println("进入map映射");
             wareSkuService.addStock(wareSkuEntity);
             //return wareSkuEntity;
-        }));
+        }));*/
 
     }
 

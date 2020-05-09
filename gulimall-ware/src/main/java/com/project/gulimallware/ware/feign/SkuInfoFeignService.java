@@ -15,7 +15,7 @@ import java.util.Map;
  * sku的远程服务接口
  */
 @FeignClient(value = "gulimall-product-11000")
-public interface SkuInfoService {
+public interface SkuInfoFeignService {
 
     /**
      * 获取sku的信息
