@@ -1,8 +1,11 @@
 package com.project.gulimallproduct.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.project.gulimallproduct.product.entity.ProductAttrValueEntity;
+import com.project.gulimallproduct.product.service.ProductAttrValueService;
 import com.project.gulimallproduct.product.vo.AttrRespVo;
 import com.project.gulimallproduct.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,9 @@ import io.renren.common.utils.R;
 public class AttrController {
     @Autowired
     private AttrService attrService;
+
+    @Autowired
+    ProductAttrValueService productAttrValueService;
 
     /**
      * 规格参数列表
@@ -64,6 +70,26 @@ public class AttrController {
         PageUtils page = attrService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 获取spu的基本属性列表
+     */
+    @RequestMapping("/base/listforspu/{spuid}")
+    //@RequiresPermissions("product:attr:list")
+    public R baseAttrforSpu(@PathVariable("spuid") Long spuId){
+        List<ProductAttrValueEntity> list = productAttrValueService.baseAttrListForSpu(spuId);
+        return R.ok().put("data", list);
+    }
+
+    /**
+     * 更新spu的基本属性列表
+     */
+    @RequestMapping("/update/{spuid}")
+    //@RequiresPermissions("product:attr:list")
+    public R updateAttrforSpu(@PathVariable("spuid") Long spuId,@RequestBody List<ProductAttrValueEntity> list){
+        productAttrValueService.updateAttrListForSpu(spuId,list);
+        return R.ok();
     }
 
 

@@ -19,6 +19,7 @@ import io.renren.common.utils.Query;
 import com.project.gulimallproduct.product.dao.ProductAttrValueDao;
 import com.project.gulimallproduct.product.entity.ProductAttrValueEntity;
 import com.project.gulimallproduct.product.service.ProductAttrValueService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("productAttrValueService")
@@ -58,6 +59,31 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
 
         this.saveBatch(spuAttrVlues);
 
+    }
+
+    @Override
+    public List<ProductAttrValueEntity> baseAttrListForSpu(Long spuId) {
+
+        QueryWrapper<ProductAttrValueEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("spu_id",spuId);
+        List<ProductAttrValueEntity> baseAttrList = this.list(queryWrapper);
+        return baseAttrList;
+    }
+
+    @Transactional(rollbackFor = {})
+    @Override
+    public void updateAttrListForSpu(Long spuId, List<ProductAttrValueEntity> list) {
+
+        //先删除原有的属性
+        this.remove(new QueryWrapper<ProductAttrValueEntity>().eq("spu_id",spuId));
+        //插入新的属性
+        list = list.stream().map(
+                (item->{
+                    item.setSpuId(spuId);
+                    return item;
+                })
+        ).collect(Collectors.toList());
+        this.saveBatch(list);
     }
 
 }
