@@ -203,6 +203,7 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
         else {
             purchaseEntity.setStatus(WareConst.PurchaseStatusEnum.ERROR.getCode());
         }
+        this.updateById(purchaseEntity);
 
         //3.入库
         /*purchaseDetailEntityList.forEach((purchaseDetailEntity -> {
