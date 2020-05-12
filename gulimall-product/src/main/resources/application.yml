@@ -3,6 +3,8 @@ ribbon:
   ReadTimeout: 30000
   ConnectTimeout: 30000
 
+
+
 server:
   port: 11000
 
@@ -27,8 +29,12 @@ spring:
       url: jdbc:mysql://59.110.137.100:3306/gulimall_pms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
       username: root
       password: 123456
+
   jackson:
     date-format: yyyy-MM-dd #HH:mm:ss
+
+  thymeleaf:
+    cache: false
 #      initial-size: 10
 #      max-active: 100
 #      min-idle: 10

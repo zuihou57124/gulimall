@@ -1,6 +1,7 @@
 package com.project.gulimallproduct.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.project.gulimallproduct.product.vo.Catelog2Vo;
 import io.renren.common.utils.PageUtils;
 import com.project.gulimallproduct.product.entity.CategoryEntity;
 
@@ -21,5 +22,7 @@ public interface CategoryService extends IService<CategoryEntity> {
     List<CategoryEntity> listWithTree();
 
     void updateDetail(CategoryEntity category);
+
+    Map<String,List<Catelog2Vo>> getCatelog2Json();
 }
 
