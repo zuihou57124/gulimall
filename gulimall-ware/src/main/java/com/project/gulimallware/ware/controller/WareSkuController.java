@@ -1,15 +1,13 @@
 package com.project.gulimallware.ware.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.project.gulimallware.ware.vo.SkuHasStockVo;
+import io.renren.common.to.SkuHasStockTo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.project.gulimallware.ware.entity.WareSkuEntity;
 import com.project.gulimallware.ware.service.WareSkuService;
@@ -32,7 +30,21 @@ public class WareSkuController {
     private WareSkuService wareSkuService;
 
     /**
-     * 查询sku库存
+     * 查询sku是否有库存
+     */
+    @PostMapping("/hasstock")
+    //@RequiresPermissions("ware:waresku:list")
+    public R<List<SkuHasStockTo>> hasStock(@RequestBody List<Long> skuIds){
+        List<SkuHasStockTo> skuHasStockToList = wareSkuService.getSkuHasStock(skuIds);
+        R<List<SkuHasStockTo>> r = new R<>();
+        r.setData(skuHasStockToList);
+        List<SkuHasStockTo> list = r.getData();
+        return r;
+    }
+
+
+    /**
+     * 库存列表
      */
     @RequestMapping("/list")
     //@RequiresPermissions("ware:waresku:list")

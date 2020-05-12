@@ -42,6 +42,18 @@ public class SpuInfoController {
 
 
     /**
+     * 商品上架
+     */
+    @RequestMapping("/{spuId}/up")
+    //@RequiresPermissions("product:spuinfo:list")
+    public R spuUp(@PathVariable("spuId") Long spuId){
+        //PageUtils page = spuInfoService.queryPage(params);
+        spuInfoService.spuUp(spuId);
+        return R.ok();
+    }
+
+
+    /**
      * 商品列表信息
      */
     @RequestMapping("/list")

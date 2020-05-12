@@ -1,11 +1,17 @@
 package com.project.gulimallware.ware.service.impl;
 
 import com.project.gulimallware.ware.feign.SkuInfoFeignService;
+import com.project.gulimallware.ware.vo.SkuHasStockVo;
+import io.renren.common.to.SkuHasStockTo;
 import io.renren.common.to.SkuTo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -75,6 +81,24 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         }
 
 
+    }
+
+    @Override
+    public List<SkuHasStockTo> getSkuHasStock(List<Long> skuIds) {
+
+        List<SkuHasStockTo> skuhasStockVoList = skuIds.stream().map((skuId -> {
+            SkuHasStockTo skuHasStockTo = new SkuHasStockTo();
+            Long count = this.baseMapper.getStockBySkuId(skuId);
+            skuHasStockTo.setSkuId(skuId);
+            if(count==null){
+                skuHasStockTo.setHasStock(false);
+            }else {
+                skuHasStockTo.setHasStock(count>0);
+            }
+            return skuHasStockTo;
+        })).collect(Collectors.toList());
+
+        return skuhasStockVoList;
     }
 
 }

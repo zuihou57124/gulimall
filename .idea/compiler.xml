@@ -11,6 +11,7 @@
         <module name="gulimall-order" />
         <module name="gulimall-ware" />
         <module name="gulimall-third-party" />
+        <module name="gulimall-es" />
         <module name="gulimall-gateway" />
         <module name="gulimall-product" />
         <module name="renren-fast" />
@@ -23,6 +24,7 @@
       <module name="gulimall" target="1.8" />
       <module name="gulimall-common" target="1.8" />
       <module name="gulimall-coupon" target="1.8" />
+      <module name="gulimall-es" target="1.8" />
       <module name="gulimall-gateway" target="1.8" />
       <module name="gulimall-member" target="1.8" />
       <module name="gulimall-order" target="1.8" />
@@ -37,6 +39,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="gulimall-common" options="" />
       <module name="gulimall-coupon" options="" />
+      <module name="gulimall-es" options="" />
       <module name="gulimall-member" options="" />
       <module name="gulimall-order" options="" />
       <module name="gulimall-product" options="" />
