@@ -34,12 +34,11 @@ public class WareSkuController {
      */
     @PostMapping("/hasstock")
     //@RequiresPermissions("ware:waresku:list")
-    public R<List<SkuHasStockTo>> hasStock(@RequestBody List<Long> skuIds){
+    public R hasStock(@RequestBody List<Long> skuIds){
         List<SkuHasStockTo> skuHasStockToList = wareSkuService.getSkuHasStock(skuIds);
-        R<List<SkuHasStockTo>> r = new R<>();
-        r.setData(skuHasStockToList);
-        List<SkuHasStockTo> list = r.getData();
-        return r;
+        R r = R.ok();
+        //List<SkuHasStockTo> list = (List<SkuHasStockTo>) r.get("data");
+        return r.setData(skuHasStockToList);
     }
 
 

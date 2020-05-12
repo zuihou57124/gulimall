@@ -1,5 +1,6 @@
 package com.project.gulimallproduct.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.project.gulimallproduct.product.entity.*;
 import com.project.gulimallproduct.product.feign.CouponFeignService;
 import com.project.gulimallproduct.product.feign.EsFeignService;
@@ -220,9 +221,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         List<Long> skuIds =skuInfoList.stream().map((SkuInfoEntity::getSkuId)).collect(Collectors.toList());
         Map<Long, Boolean> hasStockMap = null;
         try{
-            R<List<SkuHasStockTo>> r = wareFeignService.hasStock(skuIds);
-            System.out.println(r.getData());
-            hasStockMap = r.getData().stream().collect(Collectors.toMap(SkuHasStockTo::getSkuId, item -> item.getHasStock()));
+            R r = wareFeignService.hasStock(skuIds);
+            hasStockMap = r.getData(new TypeReference<List<SkuHasStockTo>>(){}).stream().collect(Collectors.toMap(SkuHasStockTo::getSkuId, item -> item.getHasStock()));
         }catch (Exception e){
             log.error("远程调用库存服务出现异常: "+e.getMessage());
         }
