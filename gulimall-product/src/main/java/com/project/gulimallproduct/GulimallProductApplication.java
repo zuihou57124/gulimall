@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = "com.project.gulimallproduct.product.feign")
 @EnableTransactionManagement
+
 public class GulimallProductApplication {
 
     public static void main(String[] args) {

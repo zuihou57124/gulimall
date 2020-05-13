@@ -1,5 +1,7 @@
 package com.project.gulimallproduct.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.project.gulimallproduct.product.dao.CategoryBrandRelationDao;
 import com.project.gulimallproduct.product.entity.CategoryBrandRelationEntity;
@@ -7,12 +9,10 @@ import com.project.gulimallproduct.product.service.CategoryBrandRelationService;
 import com.project.gulimallproduct.product.vo.Catelog2Vo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -38,6 +38,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired(required = false)
     CategoryBrandRelationDao categoryBrandRelationDao;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -87,6 +91,19 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public Map<String, List<Catelog2Vo>> getCatelog2Json() {
+
+        Map<String, List<Catelog2Vo>> catelog2JsonMap = new HashMap<>();
+        String catelog2Json = stringRedisTemplate.opsForValue().get("catelog2Json");
+        if(StringUtils.isEmpty(catelog2Json)){
+            catelog2JsonMap = getCatelog2JsonFromdb();
+            stringRedisTemplate.opsForValue().set("catelog2Json", JSON.toJSONString(catelog2JsonMap));
+        }else {
+            catelog2JsonMap = JSON.parseObject(catelog2Json,new TypeReference<Map<String, List<Catelog2Vo>>>(){});
+        }
+        return catelog2JsonMap;
+    }
+
+    public Map<String, List<Catelog2Vo>> getCatelog2JsonFromdb() {
 
         //直接查询所有分类，然后从流中筛选，避免频繁操作数据库
         List<CategoryEntity> allCategoryList = this.list(null);
