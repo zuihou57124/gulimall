@@ -10,9 +10,11 @@ import com.project.gulimallproduct.product.vo.Catelog2Vo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -89,27 +91,70 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     }
 
+
     @Override
     public Map<String, List<Catelog2Vo>> getCatelog2Json() {
+
+        //缓存穿透：空结果缓存，并设置失效时间
+        //缓存雪崩：设置不同的随机时间值
+        //缓存击穿：加锁
 
         Map<String, List<Catelog2Vo>> catelog2JsonMap = new HashMap<>();
         String catelog2Json = stringRedisTemplate.opsForValue().get("catelog2Json");
         if(StringUtils.isEmpty(catelog2Json)){
-            catelog2JsonMap = getCatelog2JsonFromdb();
-            stringRedisTemplate.opsForValue().set("catelog2Json", JSON.toJSONString(catelog2JsonMap));
+            catelog2JsonMap = getCatelog2JsonWithLock();
         }else {
             catelog2JsonMap = JSON.parseObject(catelog2Json,new TypeReference<Map<String, List<Catelog2Vo>>>(){});
         }
         return catelog2JsonMap;
     }
 
-    public Map<String, List<Catelog2Vo>> getCatelog2JsonFromdb() {
+    //
+    public Map<String, List<Catelog2Vo>> getCatelog2JsonWithLock() {
 
+
+        //每个进程的锁都应该有一个唯一标识，防止时间自动过期后，删除其他进程的锁
+        String uuid = UUID.randomUUID().toString();
+        //从redis获得锁,同时设置锁的过期时间,防止死锁
+        Boolean hasLock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid,30,TimeUnit.SECONDS);
+        if(hasLock!=null && hasLock){
+            //如果获得锁，执行业务逻辑
+            Map<String, List<Catelog2Vo>> catelogListMap = getCategoryDataListMapFromDb();
+            //设置缓存失效的随机值，防止所有缓存在同一时间失效
+            //在数据库查询完成以后，立即将结果进行缓存，保证原子性操作
+            stringRedisTemplate.opsForValue().set("catelog2Json", JSON.toJSONString(catelogListMap),new Random().nextInt(10), TimeUnit.HOURS);
+            //释放锁,如果是自己的锁，释放
+                       /*if(uuid.equals(stringRedisTemplate.opsForValue().get("lock"))){
+                stringRedisTemplate.delete("lock");
+            }*/
+
+            String luaScript = "if redis.call(\"get\",KEYS[1]) == ARGV[1]\n" +
+                    "then\n" +
+                    "    return redis.call(\"del\",KEYS[1])\n" +
+                    "else\n" +
+                    "    return 0\n" +
+                    "end";
+            //删除和判断应该是原子性的
+            stringRedisTemplate.execute(new DefaultRedisScript<>(luaScript, Integer.class),Arrays.asList("lock"),uuid);
+
+            return catelogListMap;
+        }
+        else {
+           //如果没有获得锁，自旋等待，直到获得锁
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return getCatelog2JsonWithLock();
+        }
+    }
+
+    private Map<String, List<Catelog2Vo>> getCategoryDataListMapFromDb() {
         //直接查询所有分类，然后从流中筛选，避免频繁操作数据库
         List<CategoryEntity> allCategoryList = this.list(null);
-
         List<CategoryEntity> category1List = getChilds(allCategoryList,0L);
-        Map<String, List<Catelog2Vo>> catelogListMap = category1List.stream().collect(Collectors.toMap((categoryEntity -> categoryEntity.getCatId().toString()), (categoryEntity -> {
+        return category1List.stream().collect(Collectors.toMap((categoryEntity -> categoryEntity.getCatId().toString()), (categoryEntity -> {
             //设置二级分类
             List<CategoryEntity> catelog2List = getChilds(allCategoryList,categoryEntity.getCatId());
             List<Catelog2Vo> catelog2VoList = null;
@@ -138,8 +183,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             }
             return catelog2VoList;
         })));
-
-        return catelogListMap;
     }
 
     //获取所有子分类
