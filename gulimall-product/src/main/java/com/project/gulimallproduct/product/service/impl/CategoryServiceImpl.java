@@ -9,6 +9,7 @@ import com.project.gulimallproduct.product.service.CategoryBrandRelationService;
 import com.project.gulimallproduct.product.vo.Catelog2Vo;
 import org.apache.commons.lang.StringUtils;
 import org.redisson.Redisson;
+import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -106,13 +107,32 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         Map<String, List<Catelog2Vo>> catelog2JsonMap = new HashMap<>();
         String catelog2Json = stringRedisTemplate.opsForValue().get("catelog2Json");
         if(StringUtils.isEmpty(catelog2Json)){
-            catelog2JsonMap = getCatelog2JsonWithLock();
+            System.out.println("缓存未命中，即将查询数据库");
+            catelog2JsonMap = getCatelog2JsonWithRedissonLock();
         }else {
+            System.out.println("缓存命中");
             catelog2JsonMap = JSON.parseObject(catelog2Json,new TypeReference<Map<String, List<Catelog2Vo>>>(){});
         }
         return catelog2JsonMap;
     }
 
+    //使用redisson加锁
+    public Map<String, List<Catelog2Vo>> getCatelog2JsonWithRedissonLock() {
+
+        RLock lock = redissonClient.getLock("lock");
+        lock.lock();
+        System.out.println("线程:--"+Thread.currentThread().getId()+"加锁成功");
+        Map<String, List<Catelog2Vo>> catelogListMap = getCategoryDataListMapFromDb();
+        System.out.println("查询了数据库");
+        //设置缓存失效的随机值，防止所有缓存在同一时间失效
+        stringRedisTemplate.opsForValue().set("catelog2Json", JSON.toJSONString(catelogListMap),new Random().nextInt(60)+60, TimeUnit.SECONDS);
+        lock.unlock();
+        System.out.println("线程:--"+Thread.currentThread().getId()+"释放锁");
+        return catelogListMap;
+
+    }
+
+    //使用原生redis加锁
     public Map<String, List<Catelog2Vo>> getCatelog2JsonWithLock() {
         //每个进程的锁都应该有一个唯一标识，防止时间自动过期后，删除其他进程的锁
         String uuid = UUID.randomUUID().toString();
