@@ -8,6 +8,8 @@ import com.project.gulimallproduct.product.entity.CategoryBrandRelationEntity;
 import com.project.gulimallproduct.product.service.CategoryBrandRelationService;
 import com.project.gulimallproduct.product.vo.Catelog2Vo;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -44,6 +46,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
+    @Autowired
+    RedissonClient redissonClient;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -109,10 +113,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return catelog2JsonMap;
     }
 
-    //
     public Map<String, List<Catelog2Vo>> getCatelog2JsonWithLock() {
-
-
         //每个进程的锁都应该有一个唯一标识，防止时间自动过期后，删除其他进程的锁
         String uuid = UUID.randomUUID().toString();
         //从redis获得锁,同时设置锁的过期时间,防止死锁
@@ -135,7 +136,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                     "    return 0\n" +
                     "end";
             //删除和判断应该是原子性的
-            stringRedisTemplate.execute(new DefaultRedisScript<>(luaScript, Integer.class),Arrays.asList("lock"),uuid);
+            stringRedisTemplate.execute(new DefaultRedisScript<Long>(luaScript, Long.class),Arrays.asList("lock"),uuid);
 
             return catelogListMap;
         }
