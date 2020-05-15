@@ -19,6 +19,7 @@ spring:
     nacos:
       discovery:
         server-addr: 59.110.137.100:8848 #配置Nacos地址
-
+  thymeleaf:
+    cache: false
 
 

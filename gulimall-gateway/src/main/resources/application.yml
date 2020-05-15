@@ -67,6 +67,11 @@ spring:
             - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
 
         - id: product_route
+          uri: lb://gulimall-es-14000
+          predicates:
+            - Host=127.0.0.2
+
+        - id: product_route
           uri: lb://gulimall-product-11000
           predicates:
             - Host=127.0.0.1

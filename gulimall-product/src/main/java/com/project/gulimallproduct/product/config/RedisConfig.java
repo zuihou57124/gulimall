@@ -71,6 +71,11 @@ public class RedisConfig extends CachingConfigurerSupport{
             if(redis.getTimeToLive()!=null){
                 config = config.entryTtl(redis.getTimeToLive());
             }
+            if(!redis.isCacheNullValues()){
+                config = config.disableCachingNullValues();
+            }
+
+
             return config;
         }
 

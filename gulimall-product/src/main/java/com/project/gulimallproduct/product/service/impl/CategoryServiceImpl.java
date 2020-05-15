@@ -12,7 +12,9 @@ import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -82,6 +84,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Transactional(rollbackFor = {})
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "category",key = "'getCatelog2Json'"),
+            @CacheEvict(value = "category",key = "'getCategorys1'")
+    })
     public void updateDetail(CategoryEntity category) {
 
         this.updateById(category);
