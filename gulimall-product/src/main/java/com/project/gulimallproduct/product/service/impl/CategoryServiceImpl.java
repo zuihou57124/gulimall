@@ -12,6 +12,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -98,6 +99,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
 
     @Override
+    @Cacheable(value = {"category"},key = "#root.method.name")
     public Map<String, List<Catelog2Vo>> getCatelog2Json() {
 
         //缓存穿透：空结果缓存，并设置失效时间
@@ -105,15 +107,30 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         //缓存击穿：加锁
 
         Map<String, List<Catelog2Vo>> catelog2JsonMap = new HashMap<>();
-        String catelog2Json = stringRedisTemplate.opsForValue().get("catelog2Json");
+        catelog2JsonMap = getCategoryDataListMapFromDb();
+        /*String catelog2Json = stringRedisTemplate.opsForValue().get("catelog2Json");
         if(StringUtils.isEmpty(catelog2Json)){
             System.out.println("缓存未命中，即将查询数据库");
             catelog2JsonMap = getCatelog2JsonWithRedissonLock();
         }else {
             System.out.println("缓存命中");
             catelog2JsonMap = JSON.parseObject(catelog2Json,new TypeReference<Map<String, List<Catelog2Vo>>>(){});
-        }
+        }*/
         return catelog2JsonMap;
+    }
+
+
+    /**
+     * 获取一级分类菜单
+     */
+
+    @Override
+    @Cacheable(value = {"category"},key = "#root.method.name")
+    public List<CategoryEntity> getCategorys1() {
+
+        List<CategoryEntity> cat_level1 = this.list(new QueryWrapper<CategoryEntity>().eq("cat_level", 1));
+
+        return cat_level1;
     }
 
     //使用redisson加锁
@@ -129,7 +146,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         lock.unlock();
         System.out.println("线程:--"+Thread.currentThread().getId()+"释放锁");
         return catelogListMap;
-
     }
 
     //使用原生redis加锁

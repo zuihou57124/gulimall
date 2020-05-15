@@ -1,13 +1,15 @@
 package com.project.gulimallproduct.product.vo;
 
+
 import lombok.Data;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author qcw
  */
 @Data
-public class Catelog2Vo {
+public class Catelog2Vo implements Serializable {
 
     private String catelog1Id;
 
@@ -18,7 +20,7 @@ public class Catelog2Vo {
     private String name;
 
     @Data
-    public static class Catalog3{
+    public static class Catalog3 implements Serializable{
 
         private String catalog2Id;
 

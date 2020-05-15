@@ -33,9 +33,8 @@ public class IndexController {
     @RequestMapping({"/","index"})
     public String index(Model model){
 
-        List<CategoryEntity> categoryList = categoryService.list(new QueryWrapper<CategoryEntity>().eq("cat_level",1));
+        List<CategoryEntity> categoryList = categoryService.getCategorys1();
         model.addAttribute("categorys",categoryList);
-
         return "index";
     }
 
