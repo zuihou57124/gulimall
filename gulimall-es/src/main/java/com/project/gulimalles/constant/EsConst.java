@@ -6,6 +6,6 @@ package com.project.gulimalles.constant;
  */
 public class EsConst {
 
-    public static final String PRODUCT_INDEX = "product";
+    public static final String PRODUCT_INDEX = "gulimall_product";
 
 }
