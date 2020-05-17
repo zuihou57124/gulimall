@@ -28,7 +28,7 @@ public class SearchParam {
     /**
      * hasStock=0/1
      */
-    private Integer hasStock = 1;
+    private Integer hasStock;
 
     /**
      * 品牌id

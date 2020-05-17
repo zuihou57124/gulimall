@@ -111,7 +111,9 @@ public class ProductSearchServiceImpl implements ProductSearchService {
         }
 
         //filter查询(是否有库存)
-        boolQuery.filter(QueryBuilders.termQuery("hasStock", param.getHasStock() == 1));
+        if(param.getHasStock()!=null){
+            boolQuery.filter(QueryBuilders.termQuery("hasStock", param.getHasStock() == 1));
+        }
 
         //filter查询(价格区间)
         if(!StringUtils.isEmpty(param.getSkuPrice())){
