@@ -92,14 +92,14 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         if(catelogId==0){
             page = this.page(
                     new Query<AttrEntity>().getPage(params),
-                    queryWrapper.eq("search_type","base".equalsIgnoreCase(attrType)?1:0)
+                    queryWrapper.eq("attr_type","base".equalsIgnoreCase(attrType)?1:0)
             );
         }
         else {
             page = this.page(
                     new Query<AttrEntity>().getPage(params),
                     queryWrapper.eq("catelog_id",catelogId)
-                                .eq("search_type","base".equalsIgnoreCase(attrType)?1:0)
+                                .eq("attr_type","base".equalsIgnoreCase(attrType)?1:0)
             );
         }
 

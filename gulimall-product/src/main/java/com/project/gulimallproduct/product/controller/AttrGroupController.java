@@ -37,7 +37,7 @@ public class AttrGroupController {
 
 
     /**
-     * 获取某个分类下的规格参数列表(即search_type=1的属性)
+     * 获取某个分类下的规格参数列表(即attr_type=1的属性)
      */
     @RequestMapping("/{catelogId}/withattr")
     //@RequiresPermissions("product:attrgroup:list")

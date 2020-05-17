@@ -785,7 +785,7 @@
                         <div class="sl_value_logo">
                             <ul>
                                 <li th:each="brand : ${result.brands}">
-                                    <a href="#">
+                                    <a th:href="${'javascript:searchProduct(&quot;brandId&quot;,'+brand.brandId+')'}">
                                         <img width="118px" height="50px" th:src="${brand.brandImg}" alt="">
                                         <div th:text="${brand.brandName}">
                                             华为(HUAWEI)
@@ -817,7 +817,11 @@
                 </div>
                 <div class="sl_value">
                     <ul>
-                        <li th:each="catalog : ${result.catalogs}"><a href="#" th:text="${catalog.getCatelogName()}">5.56英寸及以上</a></li>
+                        <li th:each="catalog : ${result.catalogs}">
+                            <a th:href="${'javascript:searchProduct(&quot;catelog3Id&quot;,'+catalog.catalogId+')'}" th:text="${catalog.getCatelogName()}">
+                                5.56英寸及以上
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -830,7 +834,11 @@
                 </div>
                 <div class="sl_value">
                     <ul>
-                        <li th:each="attrValue : ${attr.getAttrValue()}"><a href="#" th:text="${attrValue}">5.56英寸及以上</a></li>
+                        <li th:each="attrValue : ${attr.getAttrValue()}">
+                            <a th:href="${'javascript:searchProduct(&quot;attrs&quot;,'+attr.attrId+'_'+attrValue+')'}" th:text="${attrValue}">
+                                5.56英寸及以上
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -1948,7 +1956,20 @@
         $(this).css("color","#D70B1C")
     },function(){
         $(this).css("color","#727272")
-    })
+    });
+
+    function searchProduct(name,value) {
+
+        let s = location.href;
+        if(s.indexOf('?')===-1){
+            s = s +'?' + name + '='+value;
+        }
+        else {
+            s = s +'&' + name + '='+value;
+        }
+        window.location.href=s;
+    };
+
 </script>
 </body>
 </html>
