@@ -36,7 +36,7 @@ public class SearchResp {
     /**
      * 查询结果包含的品牌
      */
-    private List<brandVo> brands;
+    private List<BrandVo> brands;
 
     /**
      * 查询结果包含的属性
@@ -46,11 +46,11 @@ public class SearchResp {
     /**
      * 查询结果包含的分类
      */
-    private List<catalogVo> catalogs;
+    private List<CatalogVo> catalogs;
 
 
     @Data
-    public static class brandVo{
+    public static class BrandVo{
 
         private Long brandId;
 
@@ -70,7 +70,7 @@ public class SearchResp {
     }
 
     @Data
-    public static class catalogVo{
+    public static class CatalogVo{
 
         private Long catalogId;
 
