@@ -835,7 +835,7 @@
                 <div class="sl_value">
                     <ul>
                         <li th:each="attrValue : ${attr.getAttrValue()}">
-                            <a th:href="${'javascript:searchProduct(&quot;attrs&quot;,'+attr.attrId+'_'+attrValue+')'}" th:text="${attrValue}">
+                            <a th:href="${'javascript:searchProduct(&quot;attrs&quot;,&quot'+attr.attrId+'_'+attrValue+'&quot;)'}" th:text="${attrValue}">
                                 5.56英寸及以上
                             </a>
                         </li>
@@ -1961,6 +1961,10 @@
     function searchProduct(name,value) {
 
         let s = location.href;
+        //防止两个相同的条件
+        // if(s.indexOf(name)!=-1){
+        //     s = s.replace(value,);
+        // }
         if(s.indexOf('?')===-1){
             s = s +'?' + name + '='+value;
         }

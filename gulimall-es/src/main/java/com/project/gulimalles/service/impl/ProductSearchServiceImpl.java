@@ -104,7 +104,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
                 //属性值
                 String[] attrValues = s[1].split(":");
                 nestedBooleanQuery.must(QueryBuilders.termsQuery("attrs.attrId",attrId));
-                nestedBooleanQuery.must(QueryBuilders.termsQuery("attrs.attrValue",attrValues));
+                nestedBooleanQuery.must(QueryBuilders.termsQuery("attrs.attrValue.keyword",attrValues));
                 NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery("attrs",nestedBooleanQuery, ScoreMode.None);
                 boolQuery.filter(nestedQuery);
             }
