@@ -4,6 +4,7 @@ import io.renren.common.to.es.SkuEsModel;
 import io.swagger.models.auth.In;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,6 +33,19 @@ public class SearchResp {
      * 总页码
      */
     private Long totalPages;
+
+    /**
+     * 页码数组
+     */
+    private List<Integer> pageNavs;
+
+    public void setPageNavs(){
+        List<Integer> pageNavs = new ArrayList<>();
+        for(int i=1;i<totalPages;i++){
+            pageNavs.add(i);
+        }
+        this.pageNavs = pageNavs;
+    }
 
     /**
      * 查询结果包含的品牌

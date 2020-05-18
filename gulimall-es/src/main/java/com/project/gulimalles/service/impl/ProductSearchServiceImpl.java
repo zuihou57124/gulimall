@@ -190,6 +190,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
         }
         searchResp.setTotalPages(totalPage);
         searchResp.setPageNum(param.getPageNum());
+        searchResp.setPageNavs();
 
         SearchHits hits = response.getHits();
         List<SkuEsModel> skuEsModelList = new ArrayList<>();
