@@ -28,6 +28,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,8 +78,8 @@ public class ProductSearchServiceImpl implements ProductSearchService {
             //按照关键字模糊查询高亮显示
             HighlightBuilder highlight = new HighlightBuilder();
             highlight.field("skuTitle");
-            highlight.preTags("<b style='color:red'");
-            highlight.postTags("/b>");
+            highlight.preTags("<b style='color:red'>");
+            highlight.postTags("</b>");
             searchSourceBuilder.highlighter(highlight);
         }
         //filter查询(三级分类id)
@@ -199,6 +200,10 @@ public class ProductSearchServiceImpl implements ProductSearchService {
             for (SearchHit hit : hits.getHits()) {
                 String sourceString = hit.getSourceAsString();
                 SkuEsModel skuEsModel = JSON.parseObject(sourceString, SkuEsModel.class);
+                if(!StringUtils.isEmpty(param.getKeyword())){
+                    HighlightField skuTitle = hit.getHighlightFields().get("skuTitle");
+                    skuEsModel.setSkuTitle(skuTitle.getFragments()[0].string());
+                }
                 skuEsModelList.add(skuEsModel);
             }
         }

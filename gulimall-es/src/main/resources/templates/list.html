@@ -402,7 +402,7 @@
         <a href="http://127.0.0.1"><img src="/static/search/./image/logo1.jpg" alt=""></a>
     </div>
     <div class="header_form">
-        <input id="keyword_input" type="text" placeholder="手机" />
+        <input id="keyword_input" type="text" placeholder="手机" th:value="${param.keyword}"/>
         <a href="javascript:searchByKeyword()">搜索</a>
     </div>
     <div class="header_ico">
@@ -1020,12 +1020,25 @@
                 <div class="filter">
                     <!--综合排序-->
                     <div class="filter_top">
-                        <div class="filter_top_left">
-                            <a href="#">综合排序</a>
-                            <a href="#">销量</a>
-                            <a href="#">价格</a>
+                        <div class="filter_top_left" th:with="p=${param.sort},price=${param.skuPrice}">
+                            <a sort="hasScore"
+                               th:class="${(!#strings.isEmpty(p) && #strings.endsWith(p,'desc') && #strings.startsWith(p,'hasScore'))?'sort_a desc':'sort_a'}"
+                               th:attr="style=${(#strings.isEmpty(p)||#strings.startsWith(p,'hasScore'))?'color:#FFF;border-color:#e4393c;background:#e4393c':'color:#333;border:1px solid #CCC;background:#FFF'}" class="sort_a" href="#">
+                                综合排序 [[${(!#strings.isEmpty(p) && #strings.endsWith(p,'desc') && #strings.startsWith(p,'hasScore') && #strings.endsWith(p,'desc'))?'↓':'↑'}]]
+                            </a>
+                            <a th:class="${(!#strings.isEmpty(p) && #strings.endsWith(p,'desc') && #strings.startsWith(p,'saleCount'))?'sort_a desc':'sort_a'}"
+                               sort="saleCount" th:attr="style=${(!#strings.isEmpty(p)&&#strings.startsWith(p,'saleCount'))?'color:#FFF;border-color:#e4393c;background:#e4393c':'color:#333;border:1px solid #CCC;background:#FFF'}" class="sort_a"
+                               href="#">销量 [[${(!#strings.isEmpty(p) && #strings.endsWith(p,'desc') && #strings.startsWith(p,'saleCount') && #strings.endsWith(p,'desc'))?'↓':'↑'}]]</a>
+                            <a th:class="${(!#strings.isEmpty(p) && #strings.endsWith(p,'desc') && #strings.startsWith(p,'skuPrice'))?'sort_a desc':'sort_a'}"
+                               sort="skuPrice" th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p,'skuPrice'))?'color:#FFF;border-color:#e4393c;background:#e4393c':'color:#333;border:1px solid #CCC;background:#FFF'}" class="sort_a"
+                               href="#">价格 [[${(!#strings.isEmpty(p) && #strings.endsWith(p,'desc') && #strings.startsWith(p,'skuPrice') && #strings.endsWith(p,'desc'))?'↓':'↑'}]]</a>
                             <a href="#">评论分</a>
                             <a href="#">上架时间</a>
+                            <b style='color:red'>小米</b> 白色 8g 64g
+                            <input th:value="${!#strings.isEmpty(price)? #strings.substringBefore(price,'_'):''}" id="skuPriceGte" type="number" style="width: 50px;margin-left: 20px">-
+                            <input th:value="${!#strings.isEmpty(price)? #strings.substringAfter(price,'_'):''}" id="skuPricelte" type="number" style="width: 50px">
+                            <button id="searchBySkupriceBtn">确定</button>
+
                         </div>
                         <div class="filter_top_right">
                             <span class="fp-text">
@@ -1133,8 +1146,8 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
-                                        <i></i>
+                                    <a href="#" th:with="hasStock=${param.hasStock}">
+                                        <input th:checked="${#strings.equals(hasStock,'1')?true:false}" type="checkbox" id="showHasStock">
                                         仅显示有货
                                     </a>
                                 </li>
@@ -1197,13 +1210,13 @@
                     <div class="filter_page">
                         <div class="page_wrap">
                             <span class="page_span1">
-                                <a class="page_a" href="#" th:if="${result.getPageNum()>1}">
+                                <a class="page_a" href="#" th:attr="pn=${result.getPageNum()+1}" th:if="${result.getPageNum()>1}">
                                     < 上一页
                                 </a>
-                                <a class="page_a" href="#" th:attr="style=${nav==result.getPageNum()?'border: 0;color:#ee2222;background: #fff':''}" th:each="nav : ${result.pageNavs}">
+                                <a class="page_a" href="#" th:attr="pn=${nav},style=${nav==result.getPageNum()?'border: 0;color:#ee2222;background: #fff':''}" th:each="nav : ${result.pageNavs}">
                                     [[${nav}]]
                                 </a>
-                                <a class="page_a" th:href="javascript:next('pageNum',${result.pageNum+1})" th:if="${result.getPageNum()<result.getTotalPages()}">
+                                <a class="page_a" href="#" th:attr="pn=${result.getPageNum()+1}" th:if="${result.getPageNum()<result.getTotalPages()}">
                                     下一页 >
                                 </a>
                             </span>
@@ -1960,22 +1973,77 @@
 
         let s = location.href;
         //防止两个相同的条件
-        // if(s.indexOf(name)!=-1){
-        //     s = s.replace(value,);
-        // }
-        if(s.indexOf('?')===-1){
-            s = s +'?' + name + '='+value;
-        }
-        else {
-            s = s +'&' + name + '='+value;
+        if(s.indexOf(name)!=-1&& name!='attrs'){
+            re = new RegExp(name+"="+"(.*?)([^&]*)");
+            s = s.replace(re,name+'='+value);
+        }else {
+            if(s.indexOf('?')===-1){
+                s = s +'?' + name + '='+value;
+            }
+            else {
+                s = s +'&' + name + '='+value;
+            }
         }
         window.location.href=s;
-    };
+        return false;
+    }
 
     function searchByKeyword() {
         searchProduct("keyword",$('#keyword_input').val());
+        return false;
     }
 
+    $(".page_a").click(function () {
+        let pn = $(this).attr('pn');
+        searchProduct('pageNum',pn);
+        return false;
+    })
+
+    $(".sort_a").click(function () {
+        $('.sort_a').css({'color':'#333','border':'1px solid #CCC','background':'#FFF'});
+        $('.sort_a').each(function () {
+            let text = $(this).text().replace(/↑/,"");
+            text = text.replace(/↓/,"");
+            $(this).text(text);
+        });
+        $(this).css({'color':'#FFF','border-color':'#e4393c','background':'#e4393c'});
+        $(this).toggleClass("desc");
+        //有 'desc' class就是降序
+        if($(this).hasClass("desc")){
+            let text = $(this).text().replace(/↑/,"");
+            text = text.replace(/↓/,"");
+            text = text+"↓";
+            $(this).text(text);
+            let sort_colum = $(this).attr("sort")+'_desc';
+            searchProduct("sort",sort_colum);
+        }
+        else {
+            let text = $(this).text().replace(/↑/,"");
+            text = text.replace(/↓/,"");
+            text = text+"↑";
+            $(this).text(text);
+            let sort_colum = $(this).attr("sort")+'_asc';
+            searchProduct("sort",sort_colum);
+        }
+        return false;
+    })
+
+    $('#searchBySkupriceBtn').click(function () {
+        let gte = $('#skuPriceGte').val();
+        let lte = $('#skuPricelte').val();
+        searchProduct('skuPrice',gte+'_'+lte);
+    })
+
+    $('#showHasStock').change(function () {
+        //let hasStock =$(this).val()true?1:0;
+        if($(this).prop('checked')){
+            searchProduct("hasStock",1);
+        } else {
+            re = new RegExp('([?|&]*hasStock'+"="+".*?)([^&]*)");
+            location.href = (location.href+"").replace(re,'');
+        }
+        return false;
+    })
 
 </script>
 </body>
