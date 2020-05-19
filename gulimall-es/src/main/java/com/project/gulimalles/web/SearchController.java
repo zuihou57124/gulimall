@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author qcw
  */
@@ -18,8 +20,8 @@ public class SearchController {
     ProductSearchService productSearchService;
 
     @RequestMapping("/list.html")
-    public String list(SearchParam param, Model model){
-
+    public String list(SearchParam param, Model model, HttpServletRequest httpServletRequest){
+        param.setQueryString(httpServletRequest.getQueryString());
         SearchResp result = productSearchService.search(param);
         model.addAttribute("result",result);
         return "list";

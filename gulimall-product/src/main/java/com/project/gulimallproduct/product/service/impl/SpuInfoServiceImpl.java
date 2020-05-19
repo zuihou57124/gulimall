@@ -222,7 +222,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         Map<Long, Boolean> hasStockMap = null;
         try{
             R r = wareFeignService.hasStock(skuIds);
-            hasStockMap = r.getData(new TypeReference<List<SkuHasStockTo>>(){}).stream().collect(Collectors.toMap(SkuHasStockTo::getSkuId, item -> item.getHasStock()));
+            hasStockMap = r.getData("brands",new TypeReference<List<SkuHasStockTo>>(){}).stream().collect(Collectors.toMap(SkuHasStockTo::getSkuId, item -> item.getHasStock()));
         }catch (Exception e){
             log.error("远程调用库存服务出现异常: "+e.getMessage());
         }

@@ -47,4 +47,9 @@ public class SearchParam {
 
     private Integer pageNum = 1;
 
+    /**
+     * 从页面传回的查询参数
+     */
+    private String queryString;
+
 }

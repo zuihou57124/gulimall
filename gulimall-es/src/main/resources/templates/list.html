@@ -762,6 +762,15 @@
                 <a href="#">游戏手机</a>
             </div>
         </div>
+        <!-- 面包屑导航-->
+        <div class="JD_ipone_one c">
+                <a th:href="${nav.getLink()}" th:each="nav : ${result.navVoList}">
+                    <span th:text="${nav.getNavName()}"></span>
+                    <span th:text="${nav.getNavValue()}"></span>
+                    ×
+                </a>
+        </div>
+
         <i><img src="/static/search/image/right-@1x.png" alt=""></i>
     </div>
 </div>
@@ -1034,7 +1043,6 @@
                                href="#">价格 [[${(!#strings.isEmpty(p) && #strings.endsWith(p,'desc') && #strings.startsWith(p,'skuPrice') && #strings.endsWith(p,'desc'))?'↓':'↑'}]]</a>
                             <a href="#">评论分</a>
                             <a href="#">上架时间</a>
-                            <b style='color:red'>小米</b> 白色 8g 64g
                             <input th:value="${!#strings.isEmpty(price)? #strings.substringBefore(price,'_'):''}" id="skuPriceGte" type="number" style="width: 50px;margin-left: 20px">-
                             <input th:value="${!#strings.isEmpty(price)? #strings.substringAfter(price,'_'):''}" id="skuPricelte" type="number" style="width: 50px">
                             <button id="searchBySkupriceBtn">确定</button>
@@ -1973,7 +1981,7 @@
 
         let s = location.href;
         //防止两个相同的条件
-        if(s.indexOf(name)!=-1&& name!='attrs'){
+        if(s.indexOf(name)!=-1&& name!='attrs' && name!='brandId'){
             re = new RegExp(name+"="+"(.*?)([^&]*)");
             s = s.replace(re,name+'='+value);
         }else {

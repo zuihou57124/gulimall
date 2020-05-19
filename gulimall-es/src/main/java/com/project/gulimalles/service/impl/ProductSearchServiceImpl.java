@@ -1,12 +1,17 @@
 package com.project.gulimalles.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.project.gulimalles.config.ElasticsearchConfig;
 import com.project.gulimalles.constant.EsConst;
+import com.project.gulimalles.feign.ProductServiceFeign;
 import com.project.gulimalles.service.ProductSearchService;
+import com.project.gulimalles.vo.AttrRespVo;
+import com.project.gulimalles.vo.BrandVo;
 import com.project.gulimalles.vo.SearchParam;
 import com.project.gulimalles.vo.SearchResp;
 import io.renren.common.to.es.SkuEsModel;
+import io.renren.common.utils.R;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
@@ -33,8 +38,11 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author qcw
@@ -44,6 +52,9 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     @Autowired
     RestHighLevelClient client;
+
+    @Autowired
+    ProductServiceFeign productServiceFeign;
 
     @Override
     public SearchResp search(SearchParam param) {
@@ -270,7 +281,63 @@ public class ProductSearchServiceImpl implements ProductSearchService {
             attrsList.add(attrVo);
         }
         searchResp.setAttrs(attrsList);
+
+        //封装属性面包屑导航
+        if(param.getAttrs()!=null && param.getAttrs().size()>0){
+            List<SearchResp.NavVo> navList = param.getAttrs().stream().map((attr -> {
+                SearchResp.NavVo navVo = new SearchResp.NavVo();
+                String[] s = attr.split("_");
+                navVo.setNavValue(s[1]);
+                R r = productServiceFeign.getAttrInfo(Long.parseLong(s[0]));
+                if (r.getCode() == 0) {
+                    AttrRespVo attrRespVo = r.getData("attr", new TypeReference<AttrRespVo>() {
+                    });
+                    navVo.setNavName(attrRespVo.getAttrName());
+                } else {
+                    navVo.setNavName(s[0]);
+                }
+                String replaceUrl = replaceQueryString(param,"attrs",attr);
+
+                navVo.setLink("http://127.0.0.2/list.html?" + replaceUrl);
+                return navVo;
+            })).collect(Collectors.toList());
+            searchResp.setNavVoList(navList);
+        }
+
+        //封装品牌分类等面包屑导航
+        if(param.getBrandId()!=null && param.getBrandId().size()>0){
+            List<SearchResp.NavVo> navVoList = searchResp.getNavVoList();
+            SearchResp.NavVo navVo = new SearchResp.NavVo();
+            navVo.setNavName("品牌");
+            R r = productServiceFeign.getBrandInfos(param.getBrandId());
+            if(r.getCode()==0){
+                List<BrandVo> brands = r.getData("brands", new TypeReference<List<BrandVo>>() {});
+                StringBuilder buffer = new StringBuilder();
+                String replace = "";
+                for (BrandVo brand : brands) {
+                    buffer.append(brand.getName()).append(";");
+                    replace = replaceQueryString(param, "brandId", brand.getBrandId().toString());
+                }
+                navVo.setNavValue(buffer.toString());
+                navVo.setLink("http://127.0.0.2/list.html?"+replace);
+            }
+            navVoList.add(navVo);
+            searchResp.setNavVoList(navVoList);
+        }
         return searchResp;
+    }
+
+    private String replaceQueryString(SearchParam param, String where,String what) {
+        String encode = null;
+        try {
+            encode = URLEncoder.encode(what, "UTF-8");
+            encode = encode.replace("+","%20");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String replaceUrl = param.getQueryString().replace("&" + where + "=" + encode, "");
+        replaceUrl = replaceUrl.replace("?" + where + "=" + encode, "");
+        return replaceUrl;
     }
 
 }

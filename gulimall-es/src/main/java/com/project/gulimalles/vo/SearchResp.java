@@ -62,6 +62,20 @@ public class SearchResp {
      */
     private List<CatalogVo> catalogs;
 
+    /**
+     * 面包屑导航
+     */
+    private List<NavVo> navVoList = new ArrayList<>();
+
+    
+    @Data
+    public static class NavVo{
+        private String navName;
+
+        private String navValue;
+
+        private String link;
+    }
 
     @Data
     public static class BrandVo{

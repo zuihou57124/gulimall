@@ -2,8 +2,10 @@ package com.project.gulimallproduct.product.controller;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.validGroup.Add;
 import io.renren.validGroup.Update;
 import io.renren.validGroup.UpdateStatus;
@@ -53,6 +55,18 @@ public class BrandController {
 
         return R.ok().put("brand", brand);
     }
+
+    /**
+     * 品牌列表
+     */
+    @RequestMapping("/infos")
+    //@RequiresPermissions("product:brand:info")
+    public R info(@RequestParam("brandIds") List<Long> brandIds){
+        List<BrandEntity> list = brandService.list(new QueryWrapper<BrandEntity>().in("brand_id",brandIds));
+
+        return R.ok().put("brands", list);
+    }
+
 
     /**
      * 保存
