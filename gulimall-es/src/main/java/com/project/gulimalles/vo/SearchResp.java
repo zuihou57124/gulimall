@@ -58,6 +58,11 @@ public class SearchResp {
     private List<AttrVo> attrs;
 
     /**
+     * 已经筛选的属性id
+     */
+    private List<Long> selectedAttrs = new ArrayList<>();
+
+    /**
      * 查询结果包含的分类
      */
     private List<CatalogVo> catalogs;

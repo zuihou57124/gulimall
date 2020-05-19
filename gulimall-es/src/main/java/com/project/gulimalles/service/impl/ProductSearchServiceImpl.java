@@ -289,6 +289,8 @@ public class ProductSearchServiceImpl implements ProductSearchService {
                 String[] s = attr.split("_");
                 navVo.setNavValue(s[1]);
                 R r = productServiceFeign.getAttrInfo(Long.parseLong(s[0]));
+                //取得被筛选的属性id
+                searchResp.getSelectedAttrs().add(Long.parseLong(s[0]));
                 if (r.getCode() == 0) {
                     AttrRespVo attrRespVo = r.getData("attr", new TypeReference<AttrRespVo>() {
                     });
@@ -336,7 +338,10 @@ public class ProductSearchServiceImpl implements ProductSearchService {
             e.printStackTrace();
         }
         String replaceUrl = param.getQueryString().replace("&" + where + "=" + encode, "");
-        replaceUrl = replaceUrl.replace("?" + where + "=" + encode, "");
+        replaceUrl = replaceUrl.replace(where + "=" + encode, "");
+        if(replaceUrl.endsWith("?")){
+            replaceUrl = replaceUrl.replace("?","");
+        }
         return replaceUrl;
     }
 

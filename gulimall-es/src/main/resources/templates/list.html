@@ -837,7 +837,7 @@
 
 
             <!--商品属性-->
-            <div class="JD_pre" th:each="attr : ${result.getAttrs()}">
+            <div class="JD_pre" th:each="attr : ${result.getAttrs()}" th:if="${!#lists.contains(result.getSelectedAttrs(),attr.getAttrId())}">
                 <div class="sl_key">
                     <span th:text="${attr.getAttrName()}">屏幕尺寸：</span>
                 </div>
@@ -1982,7 +1982,8 @@
         let s = location.href;
         //防止两个相同的条件
         if(s.indexOf(name)!=-1&& name!='attrs' && name!='brandId'){
-            re = new RegExp(name+"="+"(.*?)([^&]*)");
+            //re = new RegExp(name+"="+"(.*?)([^&]*)");
+            re = new RegExp('([^?]*'+name+'=)([^&]*)/gi');
             s = s.replace(re,name+'='+value);
         }else {
             if(s.indexOf('?')===-1){
