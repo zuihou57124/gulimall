@@ -299,8 +299,12 @@ public class ProductSearchServiceImpl implements ProductSearchService {
                     navVo.setNavName(s[0]);
                 }
                 String replaceUrl = replaceQueryString(param,"attrs",attr);
+                if(StringUtils.isEmpty(replaceUrl)){
+                    navVo.setLink("http://127.0.0.2/list.html");
+                }else {
+                    navVo.setLink("http://127.0.0.2/list.html?"+replaceUrl);
+                }
 
-                navVo.setLink("http://127.0.0.2/list.html?" + replaceUrl);
                 return navVo;
             })).collect(Collectors.toList());
             searchResp.setNavVoList(navList);
@@ -321,7 +325,11 @@ public class ProductSearchServiceImpl implements ProductSearchService {
                     replace = replaceQueryString(param, "brandId", brand.getBrandId().toString());
                 }
                 navVo.setNavValue(buffer.toString());
-                navVo.setLink("http://127.0.0.2/list.html?"+replace);
+                if(StringUtils.isEmpty(replace)){
+                    navVo.setLink("http://127.0.0.2/list.html");
+                }else {
+                    navVo.setLink("http://127.0.0.2/list.html?"+replace);
+                }
             }
             navVoList.add(navVo);
             searchResp.setNavVoList(navVoList);
@@ -339,9 +347,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
         }
         String replaceUrl = param.getQueryString().replace("&" + where + "=" + encode, "");
         replaceUrl = replaceUrl.replace(where + "=" + encode, "");
-        if(replaceUrl.endsWith("?")){
-            replaceUrl = replaceUrl.replace("?","");
-        }
+
         return replaceUrl;
     }
 
