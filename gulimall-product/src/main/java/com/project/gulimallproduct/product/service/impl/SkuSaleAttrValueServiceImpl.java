@@ -74,8 +74,9 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
                 }
                 System.out.println(saleAttr.getAttrName()+"："+attrValues);
             }
+            attrValues = attrValues.stream().distinct().collect(Collectors.toList());
             saleAttr.setAttrValues(attrValues);
-            
+
             return saleAttr;
         })).collect(Collectors.toList());
 
