@@ -53,7 +53,7 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
         List<SkuItemVo.SkuItemSaleAttrVo> skuItemSaleAttrVos;
 
         //查找出spu所有的销售属性
-        List<AttrEntity> saleAttrs = attrService.list(new QueryWrapper<AttrEntity>().eq("catelog_id", catelogid));
+        List<AttrEntity> saleAttrs = attrService.list(new QueryWrapper<AttrEntity>().eq("catelog_id", catelogid).eq("attr_type",0));
         skuItemSaleAttrVos = saleAttrs.stream().map((attrEntity -> {
             //设置销售属性的id以及名称
             SkuItemVo.SkuItemSaleAttrVo skuItemSaleAttrVo = new SkuItemVo.SkuItemSaleAttrVo();
@@ -63,18 +63,19 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
             return skuItemSaleAttrVo;
         })).collect(Collectors.toList());
 
-        return skuItemSaleAttrVos;
+        //首先根据spuid查找出所有sku
 
-
-/*        //首先根据spuid查找出所有sku
         List<SkuInfoEntity> skuList = skuInfoService.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id",spuId));
-        skuList.stream().map((skuInfoEntity -> {
+        skuItemSaleAttrVos = skuList.stream().map((skuInfoEntity -> {
             SkuItemVo.SkuItemSaleAttrVo skuItemSaleAttrVo = new SkuItemVo.SkuItemSaleAttrVo();
             //查找出sku所有的销售属性
             List<SkuSaleAttrValueEntity> skuSaleAttrValueList = this.list(new QueryWrapper<SkuSaleAttrValueEntity>().eq("sku_id", skuInfoEntity.getSkuId()));
 
-            return skuItemSaleAttrVo;
-        })).collect(Collectors.toList());*/
 
+
+            return skuItemSaleAttrVo;
+        })).collect(Collectors.toList());
+
+        return skuItemSaleAttrVos;
     }
 }
