@@ -859,7 +859,7 @@
 									</td>
 								</tr>
 							</table>
-							<img class="xiaoguo" src="/static/item/img/5a0d4181Nf70c5ebf.jpg" />
+							<img class="xiaoguo" th:src="${descUrl}" th:each="descUrl: ${#strings.listSplit(item.getSpuInfoDesc().getDecript(),',')}"/>
 							<div class="guiGebox guiGebox1">
 								<div class="guiGe">
 									<h3>主体</h3>
