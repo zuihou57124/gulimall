@@ -45,7 +45,6 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
     }
 
     /**
-     * @param id
      * @param spuId spuid
      */
     @Override
@@ -64,18 +63,32 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
         })).collect(Collectors.toList());
 
         //首先根据spuid查找出所有sku
-
         List<SkuInfoEntity> skuList = skuInfoService.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id",spuId));
-        skuItemSaleAttrVos = skuList.stream().map((skuInfoEntity -> {
-            SkuItemVo.SkuItemSaleAttrVo skuItemSaleAttrVo = new SkuItemVo.SkuItemSaleAttrVo();
-            //查找出sku所有的销售属性
-            List<SkuSaleAttrValueEntity> skuSaleAttrValueList = this.list(new QueryWrapper<SkuSaleAttrValueEntity>().eq("sku_id", skuInfoEntity.getSkuId()));
 
-
-
-            return skuItemSaleAttrVo;
+        skuItemSaleAttrVos = skuItemSaleAttrVos.stream().map((saleAttr -> {
+            List<String> attrValues = new ArrayList<>();
+            for (SkuInfoEntity skuInfoEntity : skuList) {
+                SkuSaleAttrValueEntity skuSaleAttrValue = this.getOne(new QueryWrapper<SkuSaleAttrValueEntity>().eq("attr_id", saleAttr.getAttrId()).eq("sku_id", skuInfoEntity.getSkuId()));
+                if(skuSaleAttrValue!=null){
+                    attrValues.add(skuSaleAttrValue.getAttrValue());
+                }
+                System.out.println(saleAttr.getAttrName()+"："+attrValues);
+            }
+            saleAttr.setAttrValues(attrValues);
+            
+            return saleAttr;
         })).collect(Collectors.toList());
 
         return skuItemSaleAttrVos;
+        
+/*        skuList.stream().map((skuInfoEntity -> {
+            //查找出sku所有的销售属性
+            List<SkuSaleAttrValueEntity> skuSaleAttrValueList = this.list(new QueryWrapper<SkuSaleAttrValueEntity>().eq("sku_id", skuInfoEntity.getSkuId()));
+            skuSaleAttrValueList.stream().map((skuSaleAttr -> {
+                return skuSaleAttr.getAttrValue();
+            })).collect(Collectors.toList());
+            return null;
+        })).collect(Collectors.toList());*/
+
     }
 }
