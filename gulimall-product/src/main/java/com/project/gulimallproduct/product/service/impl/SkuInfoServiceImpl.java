@@ -1,13 +1,11 @@
 package com.project.gulimallproduct.product.service.impl;
 
-import com.project.gulimallproduct.product.entity.SkuImagesEntity;
-import com.project.gulimallproduct.product.entity.SkuSaleAttrValueEntity;
-import com.project.gulimallproduct.product.entity.SpuInfoEntity;
+import com.project.gulimallproduct.product.entity.*;
 import com.project.gulimallproduct.product.feign.CouponFeignService;
-import com.project.gulimallproduct.product.service.SkuImagesService;
-import com.project.gulimallproduct.product.service.SkuSaleAttrValueService;
+import com.project.gulimallproduct.product.service.*;
 import com.project.gulimallproduct.product.vo.Attr;
 import com.project.gulimallproduct.product.vo.Images;
+import com.project.gulimallproduct.product.vo.SkuItemVo;
 import com.project.gulimallproduct.product.vo.Skus;
 import io.renren.common.to.SkuReductionTo;
 import io.renren.common.utils.R;
@@ -29,8 +27,6 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 
 import com.project.gulimallproduct.product.dao.SkuInfoDao;
-import com.project.gulimallproduct.product.entity.SkuInfoEntity;
-import com.project.gulimallproduct.product.service.SkuInfoService;
 
 
 @Service("skuInfoService")
@@ -47,6 +43,15 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Autowired
     CouponFeignService couponFeignService;
+
+    @Autowired
+    SpuInfoService spuInfoService;
+
+    @Autowired
+    SpuInfoDescService spuInfoDescService;
+
+    @Autowired
+    AttrGroupService attrGroupService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -160,5 +165,30 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     public List<SkuInfoEntity> getSkusBySpuId(Long spuId) {
 
         return this.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id",spuId));
+    }
+
+    @Override
+    public SkuItemVo getItem(Long skuId) {
+
+        SkuItemVo skuItemVo = new SkuItemVo();
+        SkuInfoEntity skuInfo = skuInfoService.getById(skuId);
+        Long spuId = skuInfo.getSpuId();
+         //1.sku基本信息
+        skuItemVo.setSkuInfo(skuInfo);
+
+         //2.sku图片信息
+        skuItemVo.setSkuImages(skuImagesService.list(new QueryWrapper<SkuImagesEntity>().eq("sku_id",skuId)));
+
+         //3.spu销售属性组合
+        List<SkuItemVo.SkuItemSaleAttrVo> saleAttrs = skuSaleAttrValueService.getSaleAttrsBySpuId(spuId,skuInfo.getCatalogId());
+        skuItemVo.setSaleAttrVos(saleAttrs);
+         //4.spu介绍(描述)
+        skuItemVo.setSpuInfoDesc(spuInfoDescService.getById(spuId));
+
+         //5.spu规格参数信息
+        List<SkuItemVo.SpuItemBaseAttrVo> skuItemBaseAttrList = attrGroupService.getGroupAttrsBySpuId(spuId,skuInfo.getCatalogId());
+        skuItemVo.setGroupAttrs(skuItemBaseAttrList);
+
+        return skuItemVo;
     }
 }

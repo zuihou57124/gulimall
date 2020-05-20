@@ -3,7 +3,11 @@ package com.project.gulimallproduct.product.web;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.project.gulimallproduct.product.entity.CategoryEntity;
 import com.project.gulimallproduct.product.service.CategoryService;
+import com.project.gulimallproduct.product.service.SkuImagesService;
+import com.project.gulimallproduct.product.service.SkuInfoService;
+import com.project.gulimallproduct.product.service.SpuInfoService;
 import com.project.gulimallproduct.product.vo.Catelog2Vo;
+import com.project.gulimallproduct.product.vo.SkuItemVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +24,9 @@ public class IndexController {
     @Autowired
     CategoryService categoryService;
 
+    @Autowired
+    SkuInfoService skuInfoService;
+
     @ResponseBody
     @RequestMapping("/index/catalog.json")
     public Map<String,List<Catelog2Vo>> getCatelogJson(){
@@ -30,12 +37,19 @@ public class IndexController {
     }
 
 
-    @RequestMapping({"/","index"})
+    @RequestMapping({"/","index.html"})
     public String index(Model model){
 
         List<CategoryEntity> categoryList = categoryService.getCategorys1();
         model.addAttribute("categorys",categoryList);
         return "index";
+    }
+
+    @RequestMapping("/{skuId}.html")
+    public String item(@PathVariable Long skuId,Model model){
+
+        SkuItemVo item = skuInfoService.getItem(skuId);
+        return "item";
     }
 
 }

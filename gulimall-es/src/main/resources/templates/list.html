@@ -1177,7 +1177,7 @@
                                 <a href="#">关注</a>
                             </div>
                             <p class="da">
-                                <a href="#" title="现在购买，获得原厂2年整机保修(含电池)，和多达2次意外损坏的保修服务。购买勾选：保障服务、原厂保2年。">
+                                <a th:href="${'http://127.0.0.3/'+product.skuId+'.html'}" title="现在购买，获得原厂2年整机保修(含电池)，和多达2次意外损坏的保修服务。购买勾选：保障服务、原厂保2年。">
                                     <img th:src="${product.getSkuImg()}" class="dim">
                                 </a>
                             </p>

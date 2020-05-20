@@ -5,13 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.project.gulimallproduct.product.dao.AttrAttrgroupRelationDao;
 import com.project.gulimallproduct.product.dao.AttrDao;
 import com.project.gulimallproduct.product.dao.CategoryDao;
-import com.project.gulimallproduct.product.entity.AttrAttrgroupRelationEntity;
-import com.project.gulimallproduct.product.entity.AttrEntity;
-import com.project.gulimallproduct.product.entity.CategoryEntity;
+import com.project.gulimallproduct.product.entity.*;
 import com.project.gulimallproduct.product.service.AttrAttrgroupRelationService;
 import com.project.gulimallproduct.product.service.AttrService;
+import com.project.gulimallproduct.product.service.ProductAttrValueService;
+import com.project.gulimallproduct.product.vo.Attr;
 import com.project.gulimallproduct.product.vo.AttrAndGroupVo;
 import com.project.gulimallproduct.product.vo.AttrGroupRelationVo;
+import com.project.gulimallproduct.product.vo.SkuItemVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import com.project.gulimallproduct.product.dao.AttrGroupDao;
-import com.project.gulimallproduct.product.entity.AttrGroupEntity;
 import com.project.gulimallproduct.product.service.AttrGroupService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -55,6 +55,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Autowired
     AttrService attrService;
+
+    @Autowired
+    ProductAttrValueService productAttrValueService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -224,5 +227,42 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                 .collect(Collectors.toList());
 
         return attrAndGroupVoList;
+    }
+
+    /**
+     * @param spuId spuid
+     * 获得spu的分组属性信息
+     */
+    @Override
+    public List<SkuItemVo.SpuItemBaseAttrVo> getGroupAttrsBySpuId(Long spuId,Long catelogId) {
+
+        List<SkuItemVo.SpuItemBaseAttrVo> groupAttrs;
+
+        List<AttrGroupEntity> attrGroupEntityList = attrGroupDao.selectList(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catelogId));
+        groupAttrs = attrGroupEntityList.stream().map((attrGroupEntity -> {
+            SkuItemVo.SpuItemBaseAttrVo spuItemBaseAttrVo = new SkuItemVo.SpuItemBaseAttrVo();
+            //设置分组属性的名字
+            spuItemBaseAttrVo.setGroupName(attrGroupEntity.getAttrGroupName());
+            //设置分组下的属性
+            List<SkuItemVo.SpuBaseAttrVo> spuBaseAttrs;
+            //首先得到某个分组下的所有属性id
+            List<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntityList = relationService.list(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", attrGroupEntity.getAttrGroupId()));
+            //然后根据属性id查找出这些属性记录
+            spuBaseAttrs = attrAttrgroupRelationEntityList.stream().map((relation->{
+                AttrEntity attr = attrService.getById(relation.getAttrId());
+                SkuItemVo.SpuBaseAttrVo spuBaseAttrVo = new SkuItemVo.SpuBaseAttrVo();
+                spuBaseAttrVo.setAttrName(attr.getAttrName());
+                //然后再根据attrId和spuId查找出spu对应的这个属性的取值
+                ProductAttrValueEntity productAttrValueEntity = productAttrValueService.getAttrForSpuIdAndAttrId(spuId,attr.getAttrId());
+                spuBaseAttrVo.setAttrValue(productAttrValueEntity.getAttrValue());
+
+                return spuBaseAttrVo;
+            })).collect(Collectors.toList());
+
+            spuItemBaseAttrVo.setSpuBaseAttrs(spuBaseAttrs);
+            return spuItemBaseAttrVo;
+        })).collect(Collectors.toList());
+
+        return groupAttrs;
     }
 }
