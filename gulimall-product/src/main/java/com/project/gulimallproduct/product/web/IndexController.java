@@ -49,6 +49,7 @@ public class IndexController {
     public String item(@PathVariable Long skuId,Model model){
 
         SkuItemVo item = skuInfoService.getItem(skuId);
+        model.addAttribute("item",item);
         return "item";
     }
 

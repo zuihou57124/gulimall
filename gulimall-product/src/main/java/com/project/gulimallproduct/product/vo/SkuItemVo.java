@@ -19,6 +19,11 @@ public class SkuItemVo {
     SkuInfoEntity skuInfo;
 
     /**
+     * 是否有货(默认有货)
+     */
+    Boolean hasStock = true;
+
+    /**
      * 2.sku图片信息
      */
     List<SkuImagesEntity> skuImages;

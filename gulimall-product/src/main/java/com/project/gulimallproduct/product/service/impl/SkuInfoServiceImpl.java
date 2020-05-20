@@ -13,6 +13,7 @@ import net.bytebuddy.asm.Advice;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -168,6 +169,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     }
 
     @Override
+    @Cacheable(value = "item",key = "#root.args[0]")
     public SkuItemVo getItem(Long skuId) {
 
         SkuItemVo skuItemVo = new SkuItemVo();
