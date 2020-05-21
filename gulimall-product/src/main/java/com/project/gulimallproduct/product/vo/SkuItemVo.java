@@ -55,6 +55,17 @@ public class SkuItemVo {
     }
 
     /**
+     * 每种属性值被包含在哪些sku中
+     */
+    @Data
+    public static class SaleAttrWithSkuId{
+
+        private String attrName;
+
+        private List<String> attrValues;
+    }
+
+    /**
      * spu所属分组的所有规格参数
      */
     @Data
@@ -65,6 +76,7 @@ public class SkuItemVo {
         private List<SpuBaseAttrVo> spuBaseAttrs;
 
     }
+
 
     /**
      * spu规格参数
