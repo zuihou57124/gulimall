@@ -116,8 +116,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
                 skuInfo.setCatalogId(spuInfo.getCatalogId());
                 skuInfo.setSaleCount(0L);
                 skuInfo.setSkuDefaultImg(dftImg);
+                System.out.println("保存了:====>"+skuInfo);
                 skuInfoService.save(skuInfo);
-
+                //this.baseMapper.insert(skuInfo);
                 //保存sku的图片信息
                 List<SkuImagesEntity> skuImageList = skuImages.stream().map((skuImageVo -> {
                             SkuImagesEntity skuImage = new SkuImagesEntity();
@@ -158,7 +159,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
                 return skuInfo;
             })).collect(Collectors.toList());
 
-            this.saveBatch(skuInfoList);
+            //this.saveBatch(skuInfoList);
 
     }
 
