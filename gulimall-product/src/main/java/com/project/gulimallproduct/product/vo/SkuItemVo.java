@@ -52,6 +52,8 @@ public class SkuItemVo {
         private String attrName;
 
         private List<String> attrValues;
+
+        private List<SaleAttrWithSkuId> attrValues2;
     }
 
     /**
@@ -60,9 +62,9 @@ public class SkuItemVo {
     @Data
     public static class SaleAttrWithSkuId{
 
-        private String attrName;
+        private String attrValue;
 
-        private List<String> attrValues;
+        private String skuIds="";
     }
 
     /**

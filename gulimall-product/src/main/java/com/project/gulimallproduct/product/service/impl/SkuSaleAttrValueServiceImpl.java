@@ -64,21 +64,55 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
 
         //首先根据spuid查找出所有sku
         List<SkuInfoEntity> skuList = skuInfoService.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id",spuId));
-
+        List<SkuSaleAttrValueEntity> skuSaleAttrValueList = new ArrayList<>();
+        //收集每种属性存在的属性值
         skuItemSaleAttrVos = skuItemSaleAttrVos.stream().map((saleAttr -> {
-            List<String> attrValues = new ArrayList<>();
+            List<SkuItemVo.SaleAttrWithSkuId> attrValues = new ArrayList<>();
             for (SkuInfoEntity skuInfoEntity : skuList) {
+                SkuItemVo.SaleAttrWithSkuId saleAttrWithSkuId = new SkuItemVo.SaleAttrWithSkuId();
                 SkuSaleAttrValueEntity skuSaleAttrValue = this.getOne(new QueryWrapper<SkuSaleAttrValueEntity>().eq("attr_id", saleAttr.getAttrId()).eq("sku_id", skuInfoEntity.getSkuId()));
                 if(skuSaleAttrValue!=null){
-                    attrValues.add(skuSaleAttrValue.getAttrValue());
+                    skuSaleAttrValueList.add(skuSaleAttrValue);
+                    saleAttrWithSkuId.setAttrValue(skuSaleAttrValue.getAttrValue());
+                    attrValues.add(saleAttrWithSkuId);
                 }
                 System.out.println(saleAttr.getAttrName()+"："+attrValues);
             }
             attrValues = attrValues.stream().distinct().collect(Collectors.toList());
-            saleAttr.setAttrValues(attrValues);
+            saleAttr.setAttrValues2(attrValues);
 
             return saleAttr;
         })).collect(Collectors.toList());
+
+
+
+        //收集每种属性的值存在于多少种sku中
+        for (int i = 0; i < skuItemSaleAttrVos.size(); i++) {
+            SkuItemVo.SkuItemSaleAttrVo saleAttrVo = skuItemSaleAttrVos.get(i);
+            List<SkuItemVo.SaleAttrWithSkuId> attrValues2 = saleAttrVo.getAttrValues2();
+
+            for (int k = 0; k < attrValues2.size(); k++) {
+                SkuItemVo.SaleAttrWithSkuId saleAttrWithSkuId = attrValues2.get(k);
+
+                for (int j = 0; j < skuSaleAttrValueList.size(); j++) {
+                    SkuSaleAttrValueEntity skuSaleAttrValue = skuSaleAttrValueList.get(j);
+                    if(skuSaleAttrValue.getAttrId().equals(saleAttrVo.getAttrId())&&skuSaleAttrValue.getAttrValue().equals(saleAttrWithSkuId.getAttrValue())){
+                        if("".equals(saleAttrWithSkuId.getSkuIds())){
+                            saleAttrWithSkuId.setSkuIds(skuSaleAttrValue.getSkuId().toString());
+                        }
+                        else {
+                            saleAttrWithSkuId.setSkuIds(saleAttrWithSkuId.getSkuIds()+","+skuSaleAttrValue.getSkuId());
+                        }
+
+                    }
+                }
+            attrValues2.set(k,saleAttrWithSkuId);
+            }
+            saleAttrVo.setAttrValues2(attrValues2);
+            skuItemSaleAttrVos.set(i,saleAttrVo);
+        }
+
+
 
         return skuItemSaleAttrVos;
         

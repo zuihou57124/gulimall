@@ -601,8 +601,8 @@
 					<div class="box-attr clear" th:each="saleAttr: ${item.getSaleAttrVos()}">
 						<dl>
 							<dt>选择[[${saleAttr.attrName}]]</dt>
-							<dd th:each="value:${saleAttr.getAttrValues()}">
-								<a href="/static/item/#" th:text="${value}"></a>
+							<dd th:each="value:${saleAttr.getAttrValues2()}">
+								<a class="sku_attr_value" th:attr="skus=${value.getSkuIds()},class=${#lists.contains(#strings.listSplit(value.getSkuIds(),','),item.skuInfo.skuId.toString())?'sku_attr_value checked':'sku_attr_value'}" href="javascript:void(0)" th:text="${value.getAttrValue()}"></a>
 							</dd>
 						</dl>
 					</div>
@@ -1270,6 +1270,16 @@
 <script src="/static/item/js/jquery1.9.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/item/js/js.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
+
+	$(".sku_attr_value").click(function () {
+
+	})
+
+	$(function () {
+		$("a[class='sku_attr_value']").parent().css({"border":"solid 1px #CCC"});
+		$("a[class='sku_attr_value checked']").css({"border":"solid 1px red"});
+	})
+
 </script>
 
 </html>
