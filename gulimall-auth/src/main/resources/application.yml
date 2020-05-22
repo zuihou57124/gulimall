@@ -1,0 +1,38 @@
+#ribbon的超时时间
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
+
+server:
+  port: 20000
+
+spring:
+
+  #redis配置
+  redis:
+    host: 59.110.137.100
+    port: 6379
+
+  application:
+    name: gulimall-auth-20000
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 59.110.137.100:8848 #配置Nacos地址
+
+  jackson:
+    date-format: yyyy-MM-dd #HH:mm:ss
+
+  thymeleaf:
+    cache: false
+#      initial-size: 10
+#      max-active: 100
+#      min-idle: 10
+#      max-wait: 60000
+#      pool-prepared-statements: true
+#      max-pool-prepared-statement-per-connection-size: 20
+#      time-between-eviction-runs-millis: 60000
+#      min-evictable-idle-time-millis: 300000
+
+
+
