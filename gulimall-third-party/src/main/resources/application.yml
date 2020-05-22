@@ -18,6 +18,12 @@ spring:
     alicloud:
       access-key: LTAI4GCgva5jtoYnBtYEkfV2
       secret-key: Psx2aEs86ncYoY58HhuQ5ZsAtiUTpD
+      sms:
+        host: https://smsmsgs.market.alicloudapi.com
+        path: /sms/
+        skin: 1
+        sign: 1
+        appcode: 9d94d91eceaf4c37891f1e54518c205b
       oss:
         endpoint: oss-cn-shenzhen.aliyuncs.com
         bucket: qinfengoss

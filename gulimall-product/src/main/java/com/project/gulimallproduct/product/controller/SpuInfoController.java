@@ -6,7 +6,6 @@ import java.util.Map;
 import com.project.gulimallproduct.product.feign.CouponFeignService;
 import com.project.gulimallproduct.product.vo.SpuSaveVo;
 import io.renren.common.to.SpuBoundTo;
-import oracle.jdbc.proxy.annotation.Post;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

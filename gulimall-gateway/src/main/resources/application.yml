@@ -74,8 +74,12 @@ spring:
         - id: product_route
           uri: lb://gulimall-product-11000
           predicates:
-            - Host=,127.0.0.3 #首页和商品详情页
+            - Host=127.0.0.1,127.0.0.3 #首页和商品详情页
 
+        - id: product_route
+          uri: lb://gulimall-auth-20000
+          predicates:
+            - Host=127.0.0.4 #登录与注册
 
   ## 前端项目，/api
 
