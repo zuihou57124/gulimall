@@ -2,6 +2,7 @@ package com.project.gulimallproduct.product.config;
 
 import lombok.Data;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.*;
 
@@ -10,6 +11,7 @@ import java.util.concurrent.*;
  * 自定义线程池配置
  */
 @Data
+@Configuration
 public class MyThreadConfig {
 
     @Bean
