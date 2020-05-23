@@ -11,8 +11,8 @@ public class AuthConst {
 
     public enum SmsEnum{
 
-        SMS_SEND_NOTIME(701,"发送频率过高"),
-        SMS_SEND_PHONENUM_NULL(702,"请输入手机号");
+        SMS_SEND_NOTIME(10001,"发送频率过高"),
+        SMS_SEND_PHONENUM_NULL(10002,"请输入手机号");
 
         int code;
 

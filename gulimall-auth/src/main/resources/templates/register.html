@@ -5141,7 +5141,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 				var stuList = getStuList(); //设置传送信息：学生的集合
 
 				//聚焦失焦input
-				$('input').eq(0).focus(function() {
+				/*$('input').eq(0).focus(function() {
 					if($(this).val().length == 0) {
 						$(this).parent().next("div").text("支持中文，字母，数字，'-'，'_'的多种组合");
 					}
@@ -5150,13 +5150,35 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 					if($(this).val().length == 0) {
 						$(this).parent().next("div").text("建议使用字母、数字和符号两种以上的组合，6-20个字符");
 					}
-				})
+				})*/
 				$('input').eq(2).focus(function() {
 					if($(this).val().length == 0) {
-						$(this).parent().next("div").text("请再次输入密码");
+						$(this).parent().next("div").text("请确认密码");
+						$(this).parent().next("div").css({"color":"red"});
 					}
 				})
-				$('input').eq(3).focus(function() {
+
+				$('input').eq(3).blur(function() {
+					if($(this).val().length == 0) {
+						$(this).parent().next("div").text("请再次输入密码");
+						$(this).parent().next("div").css({"color":"red"});
+					}
+				})
+
+				//	确认密码
+				$('input').eq(2).blur(function() {
+					if($(this).val().length == 0) {
+						$(this).parent().next("div").text("");
+						$(this).parent().next("div").css("color", '#ccc');
+					} else if($(this).val() != $('input').eq(1).val()) {
+						$(this).parent().next("div").text("两次密码不匹配");
+						$(this).parent().next("div").css("color", 'red');
+					} else {
+						$(this).parent().next("div").text("");
+					}
+				})
+
+				/*$('input').eq(3).focus(function() {
 					if($(this).val().length == 0) {
 						$(this).parent().next("div").text("验证完后，你可以使用该手机登陆和找回密码");
 					}
@@ -5201,18 +5223,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 							$(this).parent().next("div").text("");
 						}
 					})
-					//	确认密码
-				$('input').eq(2).blur(function() {
-						if($(this).val().length == 0) {
-							$(this).parent().next("div").text("");
-							$(this).parent().next("div").css("color", '#ccc');
-						} else if($(this).val() != $('input').eq(1).val()) {
-							$(this).parent().next("div").text("两次密码不匹配");
-							$(this).parent().next("div").css("color", 'red');
-						} else {
-							$(this).parent().next("div").text("");
-						}
-					})
+
 					//	手机号
 				$('input').eq(3).blur(function() {
 						if($(this).val().length == 0) {
@@ -5235,7 +5246,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 					}
 					str1 = str1.substring(1)
 					$("#code").text(str1);
-				}
+				}*/
 				code();
 				$("#code").click(code);
 				//	验证码验证

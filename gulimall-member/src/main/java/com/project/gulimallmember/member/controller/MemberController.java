@@ -3,14 +3,13 @@ package com.project.gulimallmember.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import io.renren.common.myconst.MyConst;
+import com.project.gulimallmember.member.exception.HasPhoneException;
+import com.project.gulimallmember.member.exception.HasUserNameException;
 import com.project.gulimallmember.member.feign.CouponFeign;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.project.gulimallmember.member.vo.RegisterVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.project.gulimallmember.member.entity.MemberEntity;
 import com.project.gulimallmember.member.service.MemberService;
@@ -46,10 +45,34 @@ public class MemberController {
 
 
     /**
+     * 注册会员
+     */
+    @PostMapping("/regsiter")
+    public R regsiter(@RequestBody RegisterVo registerVo){
+
+        try {
+            memberService.register(registerVo);
+        } catch (HasPhoneException e) {
+            System.out.println("手机已被注册");
+            return R.error(MyConst.MemberEnum.HAS_PHONE_EXCEPTION.getCode(),MyConst.MemberEnum.HAS_PHONE_EXCEPTION.getMsg());
+
+        }catch (HasUserNameException e){
+            System.out.println("用户名已被注册");
+            return R.error(MyConst.MemberEnum.HAS_USER_EXCEPTION.getCode(),MyConst.MemberEnum.HAS_USER_EXCEPTION.getMsg());
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return R.ok();
+    }
+
+
+    /**
      * 列表
      */
     @RequestMapping("/list")
-    @RequiresPermissions("member:member:list")
+    //@RequiresPermissions("member:member:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = memberService.queryPage(params);
 
@@ -61,7 +84,7 @@ public class MemberController {
      * 信息
      */
     @RequestMapping("/info/{id}")
-    @RequiresPermissions("member:member:info")
+    //@RequiresPermissions("member:member:info")
     public R info(@PathVariable("id") Long id){
 		MemberEntity member = memberService.getById(id);
 
@@ -72,7 +95,7 @@ public class MemberController {
      * 保存
      */
     @RequestMapping("/save")
-    @RequiresPermissions("member:member:save")
+    //@RequiresPermissions("member:member:save")
     public R save(@RequestBody MemberEntity member){
 		memberService.save(member);
 
@@ -83,7 +106,7 @@ public class MemberController {
      * 修改
      */
     @RequestMapping("/update")
-    @RequiresPermissions("member:member:update")
+    //@RequiresPermissions("member:member:update")
     public R update(@RequestBody MemberEntity member){
 		memberService.updateById(member);
 
@@ -94,7 +117,7 @@ public class MemberController {
      * 删除
      */
     @RequestMapping("/delete")
-    @RequiresPermissions("member:member:delete")
+    //@RequiresPermissions("member:member:delete")
     public R delete(@RequestBody Long[] ids){
 		memberService.removeByIds(Arrays.asList(ids));
 

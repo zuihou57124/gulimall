@@ -1,6 +1,7 @@
 package com.project.gulimallmember.member.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.project.gulimallmember.member.vo.RegisterVo;
 import io.renren.common.utils.PageUtils;
 import com.project.gulimallmember.member.entity.MemberEntity;
 
@@ -16,5 +17,11 @@ import java.util.Map;
 public interface MemberService extends IService<MemberEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void register(RegisterVo registerVo) throws Exception;
+
+    Boolean checkUserNameUnique(String userName);
+
+    Boolean checkPhoneUnique(String phone);
 }
 

@@ -1,8 +1,10 @@
 package com.project.gulimallauth.controller;
 
 import com.project.gulimallauth.constant.AuthConst;
+import com.project.gulimallauth.feign.MemberFeignService;
 import com.project.gulimallauth.feign.ThirdPartyFeignService;
 import com.project.gulimallauth.vo.RegisterVo;
+import io.renren.common.myconst.MyConst;
 import io.renren.common.utils.R;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +38,9 @@ public class LoginController {
     @Autowired
     RedisTemplate redisTemplate;
 
+    @Autowired
+    MemberFeignService memberFeignService;
+
     @PostMapping("/register")
     public String register(RedirectAttributes model, @Valid RegisterVo registerVo, BindingResult result){
         if(result.hasErrors()){
@@ -46,7 +52,43 @@ public class LoginController {
             return "redirect:http://127.0.0.4/register.html";
         }
 
-        return "login";
+        //校验验证码，如果正确，远程调用会员服务，存储用户注册信息
+        String redisCode = (String) redisTemplate.opsForValue().get(AuthConst.SMS_CODE_PREFIX+registerVo.getPhone());
+        if(!StringUtils.isEmpty(registerVo.getCode()) && !StringUtils.isEmpty(redisCode) ){
+            if (registerVo.getCode().equals(redisCode.split("_")[0])){
+                //验证码正确后，删除验证码
+                redisTemplate.delete(AuthConst.SMS_CODE_PREFIX+registerVo.getPhone());
+                //远程调用会员服务,进行注册
+                R r = memberFeignService.regsiter(registerVo);
+                if(r.getCode()== MyConst.MemberEnum.HAS_PHONE_EXCEPTION.getCode()){
+                    Map<String, String> resultMap = new HashMap<>();
+                    resultMap.put("phone", (String) r.get("msg"));
+                    model.addFlashAttribute("errors",resultMap);
+                    System.out.println(r.get("msg"));
+                    return "redirect:http://127.0.0.4/register.html";
+                }
+                else if(r.getCode()== MyConst.MemberEnum.HAS_USER_EXCEPTION.getCode()){
+                    Map<String, String> resultMap = new HashMap<>();
+                    resultMap.put("userName", (String) r.get("msg"));
+                    model.addFlashAttribute("errors",resultMap);
+                    System.out.println(r.get("msg"));
+                    return "redirect:http://127.0.0.4/register.html";
+                }
+                return "login";
+            }
+            else {
+                Map<String, String> resultMap = new HashMap<>();
+                resultMap.put("code","验证码错误或者已过期");
+                model.addFlashAttribute("errors",resultMap);
+                return "redirect:http://127.0.0.4/register.html";
+            }
+        }
+        else {
+            Map<String, String> resultMap = new HashMap<>();
+            resultMap.put("errors","验证码错误或者已过期");
+            model.addFlashAttribute("errors",resultMap);
+            return "redirect:http://127.0.0.4/register.html";
+        }
 
     }
 
@@ -71,8 +113,8 @@ public class LoginController {
 
         //1.接口防刷
         //2.判断验证码是否正确  redis
-
         String code = UUID.randomUUID().toString().substring(0,4)+"_"+System.currentTimeMillis();
+        System.out.println("验证码是-----"+code);
         //thirdPartyFeignService.sendCode(phone,code);
         redisTemplate.opsForValue().set(AuthConst.SMS_CODE_PREFIX+phone,code,5, TimeUnit.MINUTES);
         return R.ok();
