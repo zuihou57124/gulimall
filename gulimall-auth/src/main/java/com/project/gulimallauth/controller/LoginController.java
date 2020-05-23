@@ -3,6 +3,7 @@ package com.project.gulimallauth.controller;
 import com.project.gulimallauth.constant.AuthConst;
 import com.project.gulimallauth.feign.MemberFeignService;
 import com.project.gulimallauth.feign.ThirdPartyFeignService;
+import com.project.gulimallauth.vo.LoginVo;
 import com.project.gulimallauth.vo.RegisterVo;
 import io.renren.common.myconst.MyConst;
 import io.renren.common.utils.R;
@@ -40,6 +41,21 @@ public class LoginController {
 
     @Autowired
     MemberFeignService memberFeignService;
+
+
+    @PostMapping("/login")
+    public String login(RedirectAttributes model,LoginVo loginVo){
+
+        R r = memberFeignService.login(loginVo);
+        if(r.getCode()!=0){
+            Map<String, String> resultMap = new HashMap<>();
+            resultMap.put("errors", (String) r.get("msg"));
+            model.addFlashAttribute("errors",resultMap);
+            return "redirect:http://127.0.0.4/login.html";
+        }
+        return "redirect:http://127.0.0.1";
+    }
+
 
     @PostMapping("/register")
     public String register(RedirectAttributes model, @Valid RegisterVo registerVo, BindingResult result){
@@ -113,9 +129,10 @@ public class LoginController {
 
         //1.接口防刷
         //2.判断验证码是否正确  redis
+        //验证码存储时要加上时间戳，而发送短信时不用加
         String code = UUID.randomUUID().toString().substring(0,4)+"_"+System.currentTimeMillis();
-        System.out.println("验证码是-----"+code);
-        //thirdPartyFeignService.sendCode(phone,code);
+        System.out.println("验证码是-----"+code.split("_")[0]);
+        //thirdPartyFeignService.sendCode(phone,code.split("_")[0]);
         redisTemplate.opsForValue().set(AuthConst.SMS_CODE_PREFIX+phone,code,5, TimeUnit.MINUTES);
         return R.ok();
     }

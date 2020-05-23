@@ -1,6 +1,7 @@
 package com.project.gulimallmember.member.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.project.gulimallmember.member.vo.LoginVo;
 import com.project.gulimallmember.member.vo.RegisterVo;
 import io.renren.common.utils.PageUtils;
 import com.project.gulimallmember.member.entity.MemberEntity;
@@ -23,5 +24,7 @@ public interface MemberService extends IService<MemberEntity> {
     Boolean checkUserNameUnique(String userName);
 
     Boolean checkPhoneUnique(String phone);
+
+    MemberEntity login(LoginVo loginVo);
 }
 

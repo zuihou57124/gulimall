@@ -4,6 +4,7 @@ import com.project.gulimallmember.member.entity.MemberLevelEntity;
 import com.project.gulimallmember.member.exception.HasPhoneException;
 import com.project.gulimallmember.member.exception.HasUserNameException;
 import com.project.gulimallmember.member.service.MemberLevelService;
+import com.project.gulimallmember.member.vo.LoginVo;
 import com.project.gulimallmember.member.vo.RegisterVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -46,6 +47,28 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
     public Boolean checkPhoneUnique(String phone) {
         MemberEntity member = this.getOne(new QueryWrapper<MemberEntity>().eq("mobile", phone));
         return member == null;
+    }
+
+    @Override
+    public MemberEntity login(LoginVo loginVo) {
+
+        //对密码进行加密处理
+        String userName = loginVo.getUserName();
+        String password = loginVo.getPassword();
+        //先根据用户名或者手机号查询出用户
+        MemberEntity member = this.getOne(new QueryWrapper<MemberEntity>()
+                .eq("username", userName).or()
+                .eq("mobile",userName));
+
+        if(member!=null){
+            //查询出用户后，将页面提交的密码与数据库加密后的密码对比
+            BCryptPasswordEncoder md5 = new BCryptPasswordEncoder();
+            boolean matches = md5.matches(password, member.getPassword());
+            if(matches){
+                return member;
+            }
+        }
+        return null;
     }
 
     @Override

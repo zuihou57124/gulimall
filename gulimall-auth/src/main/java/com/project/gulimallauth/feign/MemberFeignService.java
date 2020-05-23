@@ -1,5 +1,6 @@
 package com.project.gulimallauth.feign;
 
+import com.project.gulimallauth.vo.LoginVo;
 import com.project.gulimallauth.vo.RegisterVo;
 import io.renren.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -15,5 +16,8 @@ public interface MemberFeignService {
 
     @PostMapping("/member/member/regsiter")
     R regsiter(@RequestBody RegisterVo registerVo);
+
+    @PostMapping("/member/member/login")
+    R login(@RequestBody LoginVo loginVo);
 
 }

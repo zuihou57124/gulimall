@@ -3,6 +3,7 @@ package com.project.gulimallmember.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.project.gulimallmember.member.vo.LoginVo;
 import io.renren.common.myconst.MyConst;
 import com.project.gulimallmember.member.exception.HasPhoneException;
 import com.project.gulimallmember.member.exception.HasUserNameException;
@@ -41,6 +42,20 @@ public class MemberController {
         R coupons = couponFeign.memberCoupons();
         return R.ok().put("member",memberEntity).put("allCoupons",coupons.get("allCoupons"));
 
+    }
+
+
+    /**
+     * 会员登录
+     */
+    @PostMapping("/login")
+    public R login(@RequestBody LoginVo loginVo){
+        MemberEntity member = memberService.login(loginVo);
+        if (member==null){
+            System.out.println("用户名或密码错误");
+            return R.error(MyConst.MemberEnum.USER_LOGIN_EXCEPTION.getCode(),MyConst.MemberEnum.USER_LOGIN_EXCEPTION.getMsg());
+        }
+        return R.ok();
     }
 
 
