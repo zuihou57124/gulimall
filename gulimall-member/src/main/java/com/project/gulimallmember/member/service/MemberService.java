@@ -3,6 +3,7 @@ package com.project.gulimallmember.member.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.project.gulimallmember.member.vo.LoginVo;
 import com.project.gulimallmember.member.vo.RegisterVo;
+import com.project.gulimallmember.member.vo.SocialUserVo;
 import io.renren.common.utils.PageUtils;
 import com.project.gulimallmember.member.entity.MemberEntity;
 
@@ -26,5 +27,7 @@ public interface MemberService extends IService<MemberEntity> {
     Boolean checkPhoneUnique(String phone);
 
     MemberEntity login(LoginVo loginVo);
+
+    MemberEntity login(SocialUserVo socialUserVo) throws Exception;
 }
 

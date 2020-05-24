@@ -1,14 +1,21 @@
 package com.project.gulimallmember.member.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.project.gulimallmember.member.entity.MemberLevelEntity;
 import com.project.gulimallmember.member.exception.HasPhoneException;
 import com.project.gulimallmember.member.exception.HasUserNameException;
 import com.project.gulimallmember.member.service.MemberLevelService;
+import com.project.gulimallmember.member.utils.HttpUtils;
 import com.project.gulimallmember.member.vo.LoginVo;
 import com.project.gulimallmember.member.vo.RegisterVo;
+import com.project.gulimallmember.member.vo.SocialUserVo;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -69,6 +76,50 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
             }
         }
         return null;
+    }
+
+    /**
+     * 社交登录
+     * @param socialUserVo
+     * @return member对象
+     */
+    @Override
+    public MemberEntity login(SocialUserVo socialUserVo) throws Exception {
+        //社交登录--实现登录与注册二合一
+        MemberEntity member = this.getOne(new QueryWrapper<MemberEntity>().eq("social_uid", socialUserVo.getUid()));
+        if(member==null){
+            //如果是第一次登录，,从微博服务器查询用户的昵称等信息，然后在本地生成对应的会员信息
+            member = new MemberEntity();
+            //远程请求微博服务器可能会出现异常，但是uid等基本信息必须保存
+            try{
+                Map<String,String> map = new HashMap<>();
+                map.put("access_token",socialUserVo.getAccessToken());
+                map.put("uid",socialUserVo.getUid());
+                HttpResponse response = HttpUtils.doGet("https://api.weibo.com", "/2/users/show.json", "get", new HashMap<>(), map);
+                if(response.getStatusLine().getStatusCode()==200){
+                    String jsonUser = EntityUtils.toString(response.getEntity());
+                    JSONObject user = JSONObject.parseObject(jsonUser, JSONObject.class);
+                    String name = user.getString("name");
+                    String gender = user.getString("gender");
+                    member.setNickname(name);
+                    member.setGender("m".equalsIgnoreCase(gender)?1:0);
+                }
+            }catch (Exception e){
+                System.out.println("请求微博用户信息出错");
+            }
+            member.setSocialUid(socialUserVo.getUid());
+            member.setAccessToken(socialUserVo.getAccessToken());
+            member.setExpiresIn(socialUserVo.getExpiresIn());
+            this.save(member);
+            return member;
+
+        }else {
+            //如果之前登录过，更新访问令牌
+            member.setAccessToken(socialUserVo.getAccessToken());
+            member.setExpiresIn(socialUserVo.getExpiresIn());
+            this.baseMapper.updateById(member);
+        }
+        return member;
     }
 
     @Override

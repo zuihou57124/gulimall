@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import com.project.gulimallmember.member.vo.LoginVo;
+import com.project.gulimallmember.member.vo.SocialUserVo;
 import io.renren.common.myconst.MyConst;
 import com.project.gulimallmember.member.exception.HasPhoneException;
 import com.project.gulimallmember.member.exception.HasUserNameException;
@@ -44,6 +45,23 @@ public class MemberController {
 
     }
 
+    /**
+     * 社交登录
+     */
+    @PostMapping("/auth/login")
+    public R socialLogin(@RequestBody SocialUserVo socialUserVo){
+        MemberEntity member = null;
+        try {
+            member = memberService.login(socialUserVo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (member==null){
+            System.out.println("用户名或密码错误");
+            return R.error(MyConst.MemberEnum.USER_LOGIN_EXCEPTION.getCode(),MyConst.MemberEnum.USER_LOGIN_EXCEPTION.getMsg());
+        }
+        return R.ok();
+    }
 
     /**
      * 会员登录
