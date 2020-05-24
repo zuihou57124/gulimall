@@ -105,6 +105,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
                     member.setGender("m".equalsIgnoreCase(gender)?1:0);
                 }
             }catch (Exception e){
+                e.printStackTrace();
                 System.out.println("请求微博用户信息出错");
             }
             member.setSocialUid(socialUserVo.getUid());
