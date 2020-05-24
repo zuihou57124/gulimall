@@ -21,7 +21,7 @@ public interface MemberFeignService {
     @PostMapping("/member/member/login")
     R login(@RequestBody LoginVo loginVo);
 
-    @PostMapping("/auth/login")
+    @PostMapping("/member/member/auth/login")
     R socialLogin(@RequestBody SocialUserVo socialUserVo);
 
 }
