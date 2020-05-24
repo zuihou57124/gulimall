@@ -1,10 +1,13 @@
 package com.project.gulimallauth.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.project.gulimallauth.feign.MemberFeignService;
 import com.project.gulimallauth.utils.HttpUtils;
+import com.project.gulimallauth.vo.MemberRespVo;
 import com.project.gulimallauth.vo.SocialUserVo;
 import io.renren.common.utils.R;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,7 @@ import java.util.Map;
  * @author qcw
  * 处理社交登录请求
  */
-
+@Slf4j
 @Controller
 @RequestMapping("auth")
 public class AuthController {
@@ -49,6 +52,8 @@ public class AuthController {
                 //如果是第一次用微博登录，会生成一个对应的会员信息，下次登录时会判断是否存在
                 R r = memberFeignService.socialLogin(socialUser);
                 if(r.getCode()==0){
+                    MemberRespVo member = r.getData("data", new TypeReference<MemberRespVo>() {});
+                    log.info("登录成功,用户信息是--"+member.toString());
                     return "redirect:http://127.0.0.1";
                 }
                 else {

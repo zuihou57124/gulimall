@@ -60,7 +60,7 @@ public class MemberController {
             System.out.println("用户名或密码错误");
             return R.error(MyConst.MemberEnum.USER_LOGIN_EXCEPTION.getCode(),MyConst.MemberEnum.USER_LOGIN_EXCEPTION.getMsg());
         }
-        return R.ok();
+        return R.ok().setData(member);
     }
 
     /**
