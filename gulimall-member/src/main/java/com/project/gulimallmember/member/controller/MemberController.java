@@ -18,6 +18,8 @@ import com.project.gulimallmember.member.service.MemberService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -49,8 +51,9 @@ public class MemberController {
      * 社交登录
      */
     @PostMapping("/auth/login")
-    public R socialLogin(@RequestBody SocialUserVo socialUserVo){
+    public R socialLogin(@RequestBody SocialUserVo socialUserVo, HttpServletResponse response){
         MemberEntity member = null;
+        new Cookie("aa","aa").setDomain("");
         try {
             member = memberService.login(socialUserVo);
         } catch (Exception e) {

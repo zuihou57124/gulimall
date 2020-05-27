@@ -17,9 +17,11 @@ public class SessionConfig {
     public CookieSerializer cookieSerializer() {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
         serializer.setCookieName("GULIMALLSESSIONID");
-        serializer.setCookiePath("/");
+        //serializer.setCookiePath("/");
         //serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
-        serializer.setDomainNamePattern("127.0.0(\\w+\\.[0-9]+)$");
+        serializer.setDomainNamePattern("(^127.0.0.)[1-9]{1}$");
+        //serializer.setDomainNamePattern("127.0.0.[0-9]$");
+        //serializer.setDomainName("::1");
         return serializer;
     }
 

@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.project.gulimallauth.feign.MemberFeignService;
 import com.project.gulimallauth.utils.HttpUtils;
-import com.project.gulimallauth.vo.MemberRespVo;
+import io.renren.common.vo.MemberRespVo;
 import com.project.gulimallauth.vo.SocialUserVo;
 import io.renren.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class AuthController {
     MemberFeignService memberFeignService;
 
     @RequestMapping("/weibo/success")
-    public String weibo(@RequestParam("code") String code){
+    public String weibo(@RequestParam("code") String code, HttpSession session){
 
         //换取access_token
         Map<String,String> map = new HashMap<>();
@@ -53,6 +54,7 @@ public class AuthController {
                 R r = memberFeignService.socialLogin(socialUser);
                 if(r.getCode()==0){
                     MemberRespVo member = r.getData("data", new TypeReference<MemberRespVo>() {});
+                    session.setAttribute("user",member);
                     log.info("登录成功,用户信息是--"+member.toString());
                     return "redirect:http://127.0.0.1";
                 }

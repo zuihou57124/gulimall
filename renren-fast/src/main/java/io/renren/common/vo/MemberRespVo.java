@@ -1,4 +1,4 @@
-package com.project.gulimallauth.vo;
+package io.renren.common.vo;
 
 import lombok.Data;
 import java.io.Serializable;
@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 public class MemberRespVo implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 12345L;
 
 	/**
 	 * id

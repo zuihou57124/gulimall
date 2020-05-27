@@ -75,7 +75,6 @@ public class RedisConfig extends CachingConfigurerSupport{
                 config = config.disableCachingNullValues();
             }
 
-
             return config;
         }
 
