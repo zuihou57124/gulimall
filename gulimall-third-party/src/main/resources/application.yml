@@ -16,8 +16,7 @@ spring:
       discovery:
         server-addr: 59.110.137.100:8848 #配置Nacos地址
     alicloud:
-      access-key: LTAI4GCgva5jtoYnBtYEkfV2
-      secret-key: Psx2aEs86ncYoY58HhuQ5ZsAtiUTpD
+      
       sms:
         host: https://smsmsgs.market.alicloudapi.com
         path: /sms/
